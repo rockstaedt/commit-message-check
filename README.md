@@ -27,3 +27,6 @@ $ git commit -m "Veryyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy long"
 [INFO]	 Validating commit message...
 [ERROR]	 Subject line too long. Please fix.
 ```
+
+See git documentation about hooks for further reference
+[here](https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks).
