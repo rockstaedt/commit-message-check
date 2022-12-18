@@ -1,5 +1,8 @@
 # Commit Message Checker
 
+[![build](https://github.com/rockstaedt/commit-message-check/actions/workflows/build.yml/badge.svg)](https://github.com/rockstaedt/commit-message-check/actions/workflows/build.yml)
+[![codecov](https://codecov.io/gh/rockstaedt/commit-message-check/branch/main/graph/badge.svg?token=VW245SMVP5)](https://codecov.io/gh/rockstaedt/commit-message-check)
+
 **Attention: Still under development.**
 
 This is a commit message git hook to ensure that commit messages are not too 
