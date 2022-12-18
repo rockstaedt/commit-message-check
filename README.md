@@ -17,7 +17,7 @@ prefix *sample* to enable the hook. Then, modify the executable as follows:
 ```shell
 #!/bin/sh
 
-./.git/hooks/check-commit-message $1
+./.git/hooks/commit-message-check $1
 ```
 
 Afterwards, you have to put the Golang executable from this repository into 
