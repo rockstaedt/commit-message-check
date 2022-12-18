@@ -21,7 +21,7 @@ func main() {
 	}
 
 	if cm.ValidateSubject() == false {
-		log.Println("[ERROR]\t Subject line too long. Please fix.")
+		log.Println("[ERROR]\t Abort commit. Subject line too long. Please fix.")
 		os.Exit(1)
 	}
 
