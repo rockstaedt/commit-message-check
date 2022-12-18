@@ -22,4 +22,3 @@ jobs:
         goos: ${{ matrix.goos }}
         goarch: ${{ matrix.goarch }}
         goversion: 1.19
-        extra_files: LICENSE README.md
