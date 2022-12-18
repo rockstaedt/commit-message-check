@@ -1,21 +1,12 @@
 package src
 
-import (
-	"rockstaedt/commit-message-check/src/utils"
-)
-
 type CommitMessage struct {
 	Subject     string
 	Body        []string
 	InvalidBody bool
 }
 
-func CreateCommitMessageFrom(inputPath string) (*CommitMessage, error) {
-	messageLines, err := utils.GetLinesFromTextFile(inputPath)
-	if err != nil {
-		return nil, err
-	}
-
+func CreateCommitMessageFrom(messageLines []string) (*CommitMessage, error) {
 	cm := &CommitMessage{InvalidBody: false}
 	cm.addSubject(messageLines)
 	cm.addBody(messageLines)

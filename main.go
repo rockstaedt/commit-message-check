@@ -4,11 +4,17 @@ import (
 	"log"
 	"os"
 	"rockstaedt/commit-message-check/src"
+	"rockstaedt/commit-message-check/src/utils"
 )
 
 func main() {
 	log.Println("[INFO]\t Validating commit message...")
-	cm, err := src.CreateCommitMessageFrom(os.Args[1])
+	commitLines, err := utils.GetLinesFromTextFile(os.Args[1])
+	if err != nil {
+		log.Printf("[ERROR]\t Could not read commit message lines: %q", err.Error())
+		os.Exit(1)
+	}
+	cm, err := src.CreateCommitMessageFrom(commitLines)
 	if err != nil {
 		log.Printf("[ERROR]\t Could not create object: %q", err.Error())
 		os.Exit(1)
