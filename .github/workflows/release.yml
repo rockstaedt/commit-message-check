@@ -22,3 +22,4 @@ jobs:
         goos: ${{ matrix.goos }}
         goarch: ${{ matrix.goarch }}
         goversion: 1.19
+        compress_assets: OFF
