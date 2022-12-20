@@ -18,21 +18,13 @@ further [reference](https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks).
 ### MacOS
 
 ```shell
-#!/bin/sh
-
-curl -o .git/hooks/commit-msg  \\ 
--L https://github.com/rockstaedt/commit-message-check/releases/download/v0.0.4/commit-message-check-v0.0.4-darwin-arm64 \\
-  && chmod +x .git/hooks/commit-msg
+curl -o .git/hooks/commit-msg  -L https://github.com/rockstaedt/commit-message-check/releases/download/v0.0.4/commit-message-check-v0.0.4-darwin-arm64 && chmod +x .git/hooks/commit-msg
 ```
 
 ### Linux
 
 ```shell
-#!/bin/sh
-
-curl -o .git/hooks/commit-msg  \\ 
--L https://github.com/rockstaedt/commit-message-check/releases/download/v0.0.4/commit-message-check-v0.0.4-linux-amd64 \\
-  && chmod +x .git/hooks/commit-msg
+curl -o .git/hooks/commit-msg -L https://github.com/rockstaedt/commit-message-check/releases/download/v0.0.4/commit-message-check-v0.0.4-linux-amd64 && chmod +x .git/hooks/commit-msg
 ```
 
 ## Usage
