@@ -6,7 +6,7 @@ on:
 
 jobs:
   create-release:
-    name: Release Go Binary
+    name: Create release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
@@ -22,7 +22,7 @@ jobs:
         with:
           version: ${{ steps.previoustag.outputs.tag }}
       - name: Update readme
-        run: sed -i "" "s/v[0-9]\.[0-9]\.[0-9]/${{ steps.semvers.outputs.v_patch }}/g" README.md
+        run: sed -i "s/v[0-9]\.[0-9]\.[0-9]/${{ steps.semvers.outputs.v_patch }}/g" README.md
       - name: Commit changes
         uses: EndBug/add-and-commit@v9
         with:
