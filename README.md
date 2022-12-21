@@ -2,6 +2,7 @@
 
 [![build](https://github.com/rockstaedt/commit-message-check/actions/workflows/build.yml/badge.svg)](https://github.com/rockstaedt/commit-message-check/actions/workflows/build.yml)
 [![codecov](https://codecov.io/gh/rockstaedt/commit-message-check/branch/main/graph/badge.svg?token=VW245SMVP5)](https://codecov.io/gh/rockstaedt/commit-message-check)
+[![Latest tag](https://img.shields.io/github/v/tag/rockstaedt/commit-message-check)](https://github.com/rockstaedt/commit-message-check/releases)
 
 **Attention: Still under development.**
 
