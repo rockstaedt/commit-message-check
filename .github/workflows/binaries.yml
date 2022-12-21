@@ -1,11 +1,15 @@
 name: Binaries
 on:
   release:
-    types: [published]
+    types: [ created ]
+  workflow_run:
+    workflows: [patch-release, minor-release]
+    types:
+      - completed
 
 jobs:
   create-binaries:
-    name: Release Go Binary
+    name: Atatch Go binaries to latest release
     runs-on: ubuntu-latest
     strategy:
       matrix:
