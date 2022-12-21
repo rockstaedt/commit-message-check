@@ -22,6 +22,8 @@ jobs:
     - uses: actions/checkout@v3
       with:
         fetch-depth: 0
+    - uses: "WyriHaximus/github-action-get-previous-tag@v1"
+      id: previoustag
     - uses: wangyoucao577/go-release-action@v1.34
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -29,3 +31,4 @@ jobs:
         goarch: ${{ matrix.goarch }}
         goversion: 1.19
         compress_assets: OFF
+        release_tag: ${{ steps.previoustag.outputs.tag }}
