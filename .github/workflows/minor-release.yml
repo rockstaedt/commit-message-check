@@ -1,5 +1,5 @@
-  name: Minor Release
-  on:
+name: Minor Release
+on:
   pull_request:
     types:
       - closed
