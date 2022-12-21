@@ -65,7 +65,7 @@ jobs:
 
   minor-release:
     if: github.event_name == 'pull_request'
-    name: Patch Release
+    name: Minor Release
     runs-on: ubuntu-latest
     needs: [test, build]
     steps:
