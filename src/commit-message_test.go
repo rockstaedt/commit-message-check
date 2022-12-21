@@ -2,6 +2,7 @@ package src
 
 import (
 	"github.com/stretchr/testify/assert"
+	"regexp"
 	"testing"
 )
 
@@ -52,28 +53,34 @@ func TestNewCommitMessage(t *testing.T) {
 	})
 
 	t.Run("Validates subject line", func(t *testing.T) {
-		commitMsgLinesWithLongSubject := []string{
-			"veryyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy long",
-			"",
-			"body 1",
+		getDescFrom := func(subject string) string {
+			re := regexp.MustCompile(`\.+`)
+			return re.ReplaceAllString(subject, " ")
 		}
 
 		testcases := []struct {
-			desc             string
-			commitLines      []string
+			subject          string
 			wantedValidation bool
+			withError        bool
 		}{
-			{"more than 50 characters", commitMsgLinesWithLongSubject, false},
-			{"50 characters or less", validCommitMsgLines, true},
+			{"more than................72....................................characters", false, true},
+			{"more than................50................less than 72 characters", false, false},
+			{"#1301 - More than........50..............through ID prefix", true, false},
 		}
 
 		for _, tc := range testcases {
-			t.Run(tc.desc, func(t *testing.T) {
-				cm, _ := CreateCommitMessageFrom(tc.commitLines)
+			t.Run(getDescFrom(tc.subject), func(t *testing.T) {
+				cm, _ := CreateCommitMessageFrom([]string{tc.subject})
 
-				isValid := cm.ValidateSubject()
+				validationResult, err := cm.ValidateSubject()
 
-				assert.Equal(t, tc.wantedValidation, isValid)
+				if tc.withError {
+					assert.NotNil(t, err)
+				} else {
+					assert.Nil(t, err)
+				}
+
+				assert.Equal(t, tc.wantedValidation, validationResult)
 			})
 		}
 	})
