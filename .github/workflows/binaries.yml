@@ -9,7 +9,7 @@ on:
 
 jobs:
   create-binaries:
-    name: Atatch Go binaries to latest release
+    name: Add binaries to release
     runs-on: ubuntu-latest
     strategy:
       matrix:
