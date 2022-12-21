@@ -1,4 +1,4 @@
-name: Test, Build & Patch Release for Commits
+name: CI
 on:
   push:
     branches:
