@@ -1,4 +1,4 @@
-name: Test and Build
+name: Test, Build & Patch Release for Commits
 on:
   push:
     branches:
@@ -59,7 +59,6 @@ jobs:
         uses: EndBug/add-and-commit@v9
         with:
           message: 'Insert new release tag'
-          default_author: github_actions
           tag: -a ${{ steps.semvers.outputs.v_patch }} -m "${{ steps.semvers.outputs.v_patch }}"
       - name: Create release
         uses: softprops/action-gh-release@v1
