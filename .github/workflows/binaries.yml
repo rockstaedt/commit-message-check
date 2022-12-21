@@ -1,9 +1,9 @@
 name: Binaries
 on:
   release:
-    types: [ created ]
+    types: [created]
   workflow_run:
-    workflows: [patch-release, minor-release]
+    workflows: [CI]
     types:
       - completed
 
