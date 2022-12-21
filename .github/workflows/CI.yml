@@ -33,7 +33,7 @@ jobs:
       - run: go build
 
   patch-release:
-    if: github.event_name != 'pull_request'
+    if: github.event_name == 'push'
     name: Patch Release
     runs-on: ubuntu-latest
     needs: [test, build]
@@ -61,35 +61,4 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ steps.semvers.outputs.v_patch }}
-          generate_release_notes: true
-
-  minor-release:
-    if: github.event_name == 'pull_request'
-    name: Minor Release
-    runs-on: ubuntu-latest
-    needs: [test, build]
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Get previous tag
-        id: previoustag
-        uses: "WyriHaximus/github-action-get-previous-tag@v1"
-      - name: Get next minor version
-        id: semvers
-        uses: "WyriHaximus/github-action-next-semvers@v1"
-        with:
-          version: ${{ steps.previoustag.outputs.tag }}
-      - name: Update README
-        run: sed -i "s/v[0-9]\.[0-9]\.[0-9]/${{ steps.semvers.outputs.v_patch }}/g" README.md
-      - name: Commit changes
-        uses: EndBug/add-and-commit@v9
-        with:
-          message: 'Insert new release tag'
-          tag: -a ${{ steps.semvers.outputs.v_minor }} -m "${{ steps.semvers.outputs.v_minor }}"
-      - name: Create release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ steps.semvers.outputs.v_minor }}
           generate_release_notes: true
