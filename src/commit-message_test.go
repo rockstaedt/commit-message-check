@@ -3,6 +3,7 @@ package src
 import (
 	"github.com/stretchr/testify/assert"
 	"regexp"
+	"strings"
 	"testing"
 )
 
@@ -54,33 +55,26 @@ func TestNewCommitMessage(t *testing.T) {
 
 	t.Run("Validates subject line", func(t *testing.T) {
 		getDescFrom := func(subject string) string {
-			re := regexp.MustCompile(`\.+`)
-			return re.ReplaceAllString(subject, " ")
+			re := regexp.MustCompile(`\.+|(#\d+ - )`)
+			return strings.TrimSpace(re.ReplaceAllString(subject, " "))
 		}
 
 		testcases := []struct {
-			subject          string
-			wantedValidation bool
-			withError        bool
+			subject     string
+			expectation int
 		}{
-			{"more than................72....................................characters", false, true},
-			{"more than................50................less than 72 characters", false, false},
-			{"#1301 - More than........50..............through ID prefix", true, false},
+			{"more than................72....................................characters", 23},
+			{"more than................50................less than 72 characters", 16},
+			{"#1301 - more than........50..............through ID prefix", 0},
 		}
 
 		for _, tc := range testcases {
 			t.Run(getDescFrom(tc.subject), func(t *testing.T) {
 				cm, _ := CreateCommitMessageFrom([]string{tc.subject})
 
-				validationResult, err := cm.ValidateSubject()
+				aboveSoftLimit := cm.ValidateSubject()
 
-				if tc.withError {
-					assert.NotNil(t, err)
-				} else {
-					assert.Nil(t, err)
-				}
-
-				assert.Equal(t, tc.wantedValidation, validationResult)
+				assert.Equal(t, tc.expectation, aboveSoftLimit)
 			})
 		}
 	})
