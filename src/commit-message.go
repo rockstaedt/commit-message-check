@@ -1,5 +1,10 @@
 package src
 
+import (
+	"errors"
+	"regexp"
+)
+
 type CommitMessage struct {
 	Subject     string
 	Body        []string
@@ -14,12 +19,19 @@ func CreateCommitMessageFrom(messageLines []string) (*CommitMessage, error) {
 	return cm, nil
 }
 
-func (cm *CommitMessage) ValidateSubject() bool {
-	if len(cm.Subject) > 50 {
-		return false
+func (cm *CommitMessage) ValidateSubject() (bool, error) {
+	if len(cm.Subject) > 72 {
+		return false, errors.New("subject length exceeds 72 characters")
 	}
 
-	return true
+	if len(cm.Subject) > 50 {
+		re := regexp.MustCompile(`^#\d+ -\s*(.*)$`)
+		trimmedSubject := re.ReplaceAllString(cm.Subject, `$1`)
+
+		return len(trimmedSubject) < 51, nil
+	}
+
+	return true, nil
 }
 
 func (cm *CommitMessage) addSubject(messageLines []string) {
