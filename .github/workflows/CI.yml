@@ -37,7 +37,7 @@ jobs:
 
   patch-release:
     if: github.event_name != 'pull_request'
-    name: Release
+    name: Patch Release
     runs-on: ubuntu-latest
     needs: [test, build]
     steps:
