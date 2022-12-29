@@ -1,0 +1,68 @@
+name: Create release
+on:
+  pull_request:
+    types:
+      - closed
+
+jobs:
+  semantic-version:
+    if: github.event.pull_request.merged
+    name: Get next version numbers
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Get previous tag
+        id: previous_tag
+        uses: "WyriHaximus/github-action-get-previous-tag@v1"
+        with:
+          fallback: 0.0.1
+      - name: Get next minor version
+        id: semver
+        uses: "WyriHaximus/github-action-next-semvers@v1"
+        with:
+          version: ${{ steps.previous_tag.outputs.tag }}
+    outputs:
+      v_patch: ${{ steps.semver.outputs.v_patch }}
+      v_minor: ${{ steps.semver.outputs.v_minor }}
+
+  determine-release:
+    name: Release type
+    needs: semantic-version
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    strategy:
+      matrix:
+        labels: ["bug,patch", "feature,minor"]
+        include:
+          - labels: "bug,patch"
+            version: "${{ needs.semantic-version.outputs.v_patch }}"
+          - labels: "feature,minor"
+            version: "${{ needs.semantic-version.outputs.v_minor }}"
+    steps:
+      - name: Check labels
+        uses: docker://agilepathway/pull-request-label-checker:latest
+        id: label_check
+        with:
+          any_of: ${{ matrix.labels }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set version
+        id: set_version
+        run: echo "version=${{ matrix.version }}" >> $GITHUB_OUTPUT
+    outputs:
+      version: ${{ steps.set_version.outputs.version }}
+
+  release:
+    name: Create release
+    needs: determine-release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ needs.determine-release.outputs.version }}
+          name: ${{ needs.determine-release.outputs.version }}
+          generate_release_notes: true
+          token: ${{ secrets.MY_TOKEN }}
