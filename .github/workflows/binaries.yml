@@ -1,4 +1,4 @@
-name: Release binaries
+name: Attach binaries
 on:
   release:
     types: [created]
