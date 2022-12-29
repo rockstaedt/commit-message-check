@@ -1,10 +1,10 @@
 package main
 
 import (
+	"github.com/rockstaedt/txtreader"
 	"log"
 	"os"
 	"rockstaedt/commit-message-check/src"
-	"rockstaedt/commit-message-check/src/utils"
 )
 
 const (
@@ -14,7 +14,7 @@ const (
 
 func main() {
 	log.Println("[INFO]\t Validating commit message...")
-	commitLines, err := utils.GetLinesFromTextFile(os.Args[1])
+	commitLines, err := txtreader.GetLinesFromTextFile(os.Args[1])
 	if err != nil {
 		log.Printf("[ERROR]\t Could not read commit message lines: %q", err.Error())
 		os.Exit(1)
