@@ -4,7 +4,7 @@
 [![codecov](https://codecov.io/gh/rockstaedt/commit-message-check/branch/main/graph/badge.svg?token=VW245SMVP5)](https://codecov.io/gh/rockstaedt/commit-message-check)
 [![Latest tag](https://img.shields.io/github/v/tag/rockstaedt/commit-message-check)](https://github.com/rockstaedt/commit-message-check/releases)
 
-**Attention: Still under development.**
+**Attention: Still under development!**
 
 This is a commit message git hook to ensure that commit messages are not too 
 long.
