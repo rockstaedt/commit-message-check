@@ -7,7 +7,7 @@ on:
 jobs:
   preparation:
     if: github.event.pull_request.merged
-    name: Get next version numbers
+    name: Prepare release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
