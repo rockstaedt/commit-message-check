@@ -1,4 +1,4 @@
-name: Copy labels
+name: Sync labels
 on:
   pull_request:
     types: [opened]
