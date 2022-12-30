@@ -14,10 +14,6 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Remove WIP label from linked issue
-        uses: RebeccaStevens/issue-closed-labeler-action@latest
-        with:
-          rules: '[{"condition": "WIP", "remove": "WIP"}]'
       - name: Remove WIP label from PR
         uses: actions-ecosystem/action-remove-labels@v1
         with:
