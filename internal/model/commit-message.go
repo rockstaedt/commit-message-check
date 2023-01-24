@@ -1,4 +1,4 @@
-package src
+package model
 
 import (
 	"regexp"

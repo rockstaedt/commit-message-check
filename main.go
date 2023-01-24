@@ -6,7 +6,7 @@ import (
 	"github.com/rockstaedt/txtreader"
 	"log"
 	"os"
-	"rockstaedt/commit-message-check/src"
+	"rockstaedt/commit-message-check/internal/model"
 )
 
 const (
@@ -31,7 +31,7 @@ func main() {
 		log.Printf("[ERROR]\t Could not read commit message lines: %q", err.Error())
 		os.Exit(1)
 	}
-	cm, err := src.CreateCommitMessageFrom(commitLines)
+	cm, err := model.CreateCommitMessageFrom(commitLines)
 	if err != nil {
 		log.Printf("[ERROR]\t Could not create object: %q", err.Error())
 		os.Exit(2)
