@@ -1,6 +1,8 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"github.com/rockstaedt/txtreader"
 	"log"
 	"os"
@@ -12,7 +14,17 @@ const (
 	hardLimit = 72
 )
 
+var version string
+
 func main() {
+	versionPtr := flag.Bool("v", false, "Prints the current version of the executable")
+	flag.Parse()
+
+	if *versionPtr {
+		fmt.Println(version)
+		return
+	}
+
 	log.Println("[INFO]\t Validating commit message...")
 	commitLines, err := txtreader.GetLinesFromTextFile(os.Args[1])
 	if err != nil {

@@ -28,3 +28,4 @@ jobs:
         goversion: 1.19
         compress_assets: OFF
         release_tag: ${{ steps.previoustag.outputs.tag }}
+        ldflags: -X 'main.version=${{ steps.previoustag.outputs.tag }}'
