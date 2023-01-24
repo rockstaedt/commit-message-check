@@ -22,7 +22,7 @@ func main() {
 
 	if *versionPtr {
 		fmt.Println(version)
-		return
+		os.Exit(0)
 	}
 
 	log.Println("[INFO]\t Validating commit message...")
