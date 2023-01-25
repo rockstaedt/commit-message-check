@@ -11,21 +11,14 @@ long.
 
 ## Installation
 
-Execute the command for your platform within the root folder of your git 
-project. This will download the latest release, puts it in the `./.git/hooks/`
-folder and makes it executable. See git documentation about hooks for 
+Execute the command within the root folder of your git 
+project. This will download the installation script that determines the OS and
+downloads the latest binary. Afterwards, the initialization is started and the 
+corresponding hook files are prepared. See git documentation about hooks for 
 further [reference](https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks).
 
-### MacOS
-
 ```shell
-curl -o .git/hooks/commit-msg  -L https://github.com/rockstaedt/commit-message-check/releases/download/v0.0.4/commit-message-check-v0.0.4-darwin-arm64 && chmod +x .git/hooks/commit-msg
-```
-
-### Linux
-
-```shell
-curl -o .git/hooks/commit-msg -L https://github.com/rockstaedt/commit-message-check/releases/download/v0.0.4/commit-message-check-v0.0.4-linux-amd64 && chmod +x .git/hooks/commit-msg
+curl -o install.sh  -L https://raw.githubusercontent.com/rockstaedt/commit-message-check/main/install.sh && chmod +x ./install.sh && ./install.sh
 ```
 
 ## Usage
