@@ -6,48 +6,40 @@ import (
 	"github.com/rockstaedt/txtreader"
 	"log"
 	"os"
-	"rockstaedt/commit-message-check/internal/model"
-)
-
-const (
-	softLimit = 50
-	hardLimit = 72
+	"rockstaedt/commit-message-check/cmd"
 )
 
 var version string
 
 func main() {
-	versionPtr := flag.Bool("v", false, "Prints the current version of the executable")
+	var versionFlag bool
+	flag.BoolVar(&versionFlag, "v", false, "Shows the current version of the executable.")
+
 	flag.Parse()
 
-	if *versionPtr {
+	if versionFlag {
 		fmt.Println(version)
 		os.Exit(0)
 	}
 
-	log.Println("[INFO]\t Validating commit message...")
-	commitLines, err := txtreader.GetLinesFromTextFile(os.Args[1])
-	if err != nil {
-		log.Printf("[ERROR]\t Could not read commit message lines: %q", err.Error())
+	if len(os.Args) == 1 {
+		fmt.Println("No subcommands given. Please check manual.")
 		os.Exit(1)
 	}
-	cm, err := model.CreateCommitMessageFrom(commitLines)
-	if err != nil {
-		log.Printf("[ERROR]\t Could not create object: %q", err.Error())
-		os.Exit(2)
+
+	var status int
+	switch os.Args[1] {
+	case "validate":
+		commitLines, err := txtreader.GetLinesFromTextFile(os.Args[2])
+		if err != nil {
+			log.Printf("[ERROR]\t Could not read commit message lines: %q", err.Error())
+			status = 1
+		}
+		status = cmd.Validate(commitLines)
+	default:
+		fmt.Printf("Unknown subcommand %q. Please check manual.\n", os.Args[1])
+		status = 1
 	}
 
-	numOfExceedingChars := cm.ValidateSubject()
-	if numOfExceedingChars == 0 {
-		os.Exit(0)
-	}
-
-	if numOfExceedingChars > (hardLimit - softLimit) {
-		log.Println("[ERROR]\t Abort commit. Subject line too long. Please fix.")
-		os.Exit(3)
-	}
-
-	log.Printf("[WARN]\t Your subject exceeds the soft limit of 50 chars by %d chars.", numOfExceedingChars)
-
-	os.Exit(0)
+	os.Exit(status)
 }
