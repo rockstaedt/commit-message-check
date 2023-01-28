@@ -10,12 +10,12 @@ type CommitMessage struct {
 	InvalidBody bool
 }
 
-func CreateCommitMessageFrom(messageLines []string) (*CommitMessage, error) {
+func CreateCommitMessageFrom(messageLines []string) *CommitMessage {
 	cm := &CommitMessage{InvalidBody: false}
 	cm.addSubject(messageLines)
 	cm.addBody(messageLines)
 
-	return cm, nil
+	return cm
 }
 
 func (cm *CommitMessage) ValidateSubject() int {
