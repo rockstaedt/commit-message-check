@@ -6,6 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"log"
 	"os"
+	"rockstaedt/commit-message-check/testdata/mocks"
 	"testing"
 )
 
@@ -56,5 +57,13 @@ func TestWriteCommitMsgHook(t *testing.T) {
 		_ = writeCommitMsgHook(buffer)
 
 		assert.Contains(t, buffer.String(), "./commit-message-check validate $1\n")
+	})
+
+	t.Run("returns any error", func(t *testing.T) {
+		errBuffer := mocks.FakeWriter{}
+
+		err := writeCommitMsgHook(errBuffer)
+
+		assert.NotNil(t, err)
 	})
 }
