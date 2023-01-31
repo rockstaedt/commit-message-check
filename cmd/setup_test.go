@@ -15,13 +15,18 @@ func TestSetup(t *testing.T) {
 
 	t.Run("returns 0 and init hook script", func(t *testing.T) {
 		gitPath := t.TempDir()
-		err := os.Mkdir(fmt.Sprintf("%s/hooks", gitPath), os.ModePerm)
+		hookPath := fmt.Sprintf("%s/hooks", gitPath)
+		err := os.Mkdir(hookPath, os.ModePerm)
 		assert.Nil(t, err)
 
 		status := Setup(gitPath)
 
-		assert.Equal(t, status, 0)
-		assert.FileExists(t, fmt.Sprintf("%s/hooks/commit-msg", gitPath))
+		assert.Equal(t, 0, status)
+		filePath := fmt.Sprintf("%s/commit-msg", hookPath)
+		assert.FileExists(t, filePath)
+		contentBytes, err := os.ReadFile(filePath)
+		assert.Nil(t, err)
+		assert.Contains(t, string(contentBytes), "commit-message-check validate")
 	})
 
 	t.Run("returns 1 if git repo is not initialized and logs it", func(t *testing.T) {
@@ -29,7 +34,7 @@ func TestSetup(t *testing.T) {
 
 		status := Setup("/no_existing_git")
 
-		assert.Equal(t, status, 1)
+		assert.Equal(t, 1, status)
 		assert.Contains(t, buffer.String(), "[ERROR]\t No git repository could be found.")
 	})
 }
@@ -37,13 +42,19 @@ func TestSetup(t *testing.T) {
 func TestWriteCommitMsgHook(t *testing.T) {
 	buffer := &bytes.Buffer{}
 
-	t.Run("creates file commit-msg", func(t *testing.T) {
+	t.Run("marks file as shell script", func(t *testing.T) {
+		buffer.Reset()
 
 		_ = writeCommitMsgHook(buffer)
 
+		assert.Contains(t, buffer.String(), "#!/bin/sh\n\n")
 	})
 
-	t.Run("writes content to execute commit-message-check", func(t *testing.T) {
-		t.Skip()
+	t.Run("executes commit-message-check", func(t *testing.T) {
+		buffer.Reset()
+
+		_ = writeCommitMsgHook(buffer)
+
+		assert.Contains(t, buffer.String(), "./commit-message-check validate $1")
 	})
 }

@@ -14,11 +14,21 @@ func Setup(gitPath string) int {
 		return 1
 	}
 
-	_ = os.WriteFile(fmt.Sprintf("%s/hooks/commit-msg", gitPath), nil, os.ModePerm)
+	hookBytes, err := os.Create(fmt.Sprintf("%s/hooks/commit-msg", gitPath))
+	err = writeCommitMsgHook(hookBytes)
+	if err != nil {
+		fmt.Println(err)
+		return 2
+	}
 
 	return 0
 }
 
 func writeCommitMsgHook(writer io.Writer) error {
+	_, err := fmt.Fprint(writer, "#!/bin/sh\n\n./commit-message-check validate $1")
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
