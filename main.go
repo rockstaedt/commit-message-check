@@ -29,6 +29,8 @@ func main() {
 
 	var status int
 	switch os.Args[1] {
+	case "setup":
+		status = cmd.Setup(os.Args[2])
 	case "validate":
 		commitLines, err := txtreader.GetLinesFromTextFile(os.Args[2])
 		if err != nil {
