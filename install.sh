@@ -26,6 +26,6 @@ if !(grep -Fxq "commit-message-check" .gitignore); then
   [[ "$choice" == [Yy]* ]] && echo 'commit-message-check'>>.gitignore
 fi
 
-./commit-message-check init
+./commit-message-check setup
 
 rm ./install.sh
