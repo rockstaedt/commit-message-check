@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"log"
 	"os"
 )
@@ -11,6 +12,8 @@ func Setup(gitPath string) int {
 		log.Println("[ERROR]\t No git repository could be found.")
 		return 1
 	}
+
+	_ = os.WriteFile(fmt.Sprintf("%s/hooks/commit-msg", gitPath), nil, os.ModePerm)
 
 	return 0
 }
