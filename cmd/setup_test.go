@@ -55,6 +55,6 @@ func TestWriteCommitMsgHook(t *testing.T) {
 
 		_ = writeCommitMsgHook(buffer)
 
-		assert.Contains(t, buffer.String(), "./commit-message-check validate $1")
+		assert.Contains(t, buffer.String(), "./commit-message-check validate $1\n")
 	})
 }

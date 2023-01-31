@@ -25,7 +25,7 @@ func Setup(gitPath string) int {
 }
 
 func writeCommitMsgHook(writer io.Writer) error {
-	_, err := fmt.Fprint(writer, "#!/bin/sh\n\n./commit-message-check validate $1")
+	_, err := fmt.Fprint(writer, "#!/bin/sh\n\n./commit-message-check validate $1\n")
 	if err != nil {
 		return err
 	}
