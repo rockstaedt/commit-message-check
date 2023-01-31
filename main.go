@@ -30,13 +30,20 @@ func main() {
 	var status int
 	switch os.Args[1] {
 	case "setup":
-		status = cmd.Setup(os.Args[2])
+		cwd, err := os.Getwd()
+		if err != nil {
+			log.Printf("[ERROR]\t Could not determine working directory: %q", err.Error())
+			status = 1
+		}
+		
+		status = cmd.Setup(fmt.Sprintf("%s/.git", cwd))
 	case "validate":
 		commitLines, err := txtreader.GetLinesFromTextFile(os.Args[2])
 		if err != nil {
 			log.Printf("[ERROR]\t Could not read commit message lines: %q", err.Error())
 			status = 1
 		}
+
 		status = cmd.Validate(commitLines)
 	default:
 		fmt.Printf("Unknown subcommand %q. Please check manual.\n", os.Args[1])
