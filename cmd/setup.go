@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"os"
 )
@@ -16,4 +17,8 @@ func Setup(gitPath string) int {
 	_ = os.WriteFile(fmt.Sprintf("%s/hooks/commit-msg", gitPath), nil, os.ModePerm)
 
 	return 0
+}
+
+func writeCommitMsgHook(writer io.Writer) error {
+	return nil
 }

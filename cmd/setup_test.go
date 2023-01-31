@@ -33,3 +33,17 @@ func TestSetup(t *testing.T) {
 		assert.Contains(t, buffer.String(), "[ERROR]\t No git repository could be found.")
 	})
 }
+
+func TestWriteCommitMsgHook(t *testing.T) {
+	buffer := &bytes.Buffer{}
+
+	t.Run("creates file commit-msg", func(t *testing.T) {
+
+		_ = writeCommitMsgHook(buffer)
+
+	})
+
+	t.Run("writes content to execute commit-message-check", func(t *testing.T) {
+		t.Skip()
+	})
+}
