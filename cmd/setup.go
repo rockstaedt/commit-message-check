@@ -1,22 +1,16 @@
 package cmd
 
-import "log"
+import (
+	"log"
+	"os"
+)
 
-func Setup(files []string) int {
-	if hasGitRepository(files) == false {
+func Setup(gitPath string) int {
+	_, err := os.Stat(gitPath)
+	if err != nil {
 		log.Println("[ERROR]\t No git repository could be found.")
 		return 1
 	}
 
 	return 0
-}
-
-func hasGitRepository(files []string) bool {
-	for _, file := range files {
-		if file == ".git" {
-			return true
-		}
-	}
-
-	return false
 }
