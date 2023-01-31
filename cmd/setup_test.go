@@ -30,13 +30,17 @@ func TestSetup(t *testing.T) {
 		assert.Contains(t, string(contentBytes), "commit-message-check validate")
 	})
 
-	t.Run("returns 1 if git repo is not initialized and logs it", func(t *testing.T) {
+	t.Run("returns 1 when git repo is not initialized and logs it", func(t *testing.T) {
 		buffer.Reset()
 
 		status := Setup("/no_existing_git")
 
 		assert.Equal(t, 1, status)
 		assert.Contains(t, buffer.String(), "[ERROR]\t No git repository could be found.")
+	})
+
+	t.Run("returns 2 when error at writing the commit-msg script occurs ", func(t *testing.T) {
+		t.Skip()
 	})
 }
 
