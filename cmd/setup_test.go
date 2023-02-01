@@ -14,21 +14,21 @@ func TestSetup(t *testing.T) {
 	buffer := &bytes.Buffer{}
 	log.SetOutput(buffer)
 
-	gitPath := t.TempDir()
-	hookPath := fmt.Sprintf("%s/hooks", gitPath)
-
-	setup := func() {
-		err := os.Mkdir(hookPath, os.ModePerm)
+	setup := func() string {
+		gitPath := t.TempDir()
+		err := os.Mkdir(fmt.Sprintf("%s/hooks", gitPath), os.ModePerm)
 		assert.Nil(t, err)
+
+		return gitPath
 	}
 
 	t.Run("returns 0 and init hook script", func(t *testing.T) {
-		setup()
+		gitPath := setup()
 
 		status := Setup(gitPath)
 
 		assert.Equal(t, 0, status)
-		filePath := fmt.Sprintf("%s/commit-msg", hookPath)
+		filePath := fmt.Sprintf("%s/hooks/commit-msg", gitPath)
 		assert.FileExists(t, filePath)
 		contentBytes, err := os.ReadFile(filePath)
 		assert.Nil(t, err)
@@ -52,36 +52,37 @@ func TestSetup(t *testing.T) {
 		assert.Equal(t, 2, status)
 		assert.Contains(t, buffer.String(), "[ERROR]\t Could not create commit-msg script.")
 	})
-
-	t.Run("returns 3 when error at writing hook script and logs it", func(t *testing.T) {
-		t.Skip()
-	})
 }
 
 func TestWriteCommitMsgHook(t *testing.T) {
 	buffer := &bytes.Buffer{}
 
-	t.Run("marks file as shell script", func(t *testing.T) {
+	t.Run("marks file as shell script and returns 0", func(t *testing.T) {
 		buffer.Reset()
 
-		_ = writeCommitMsgHook(buffer)
+		status := writeCommitMsgHook(buffer)
 
+		assert.Equal(t, 0, status)
 		assert.Contains(t, buffer.String(), "#!/bin/sh\n\n")
 	})
 
-	t.Run("executes commit-message-check", func(t *testing.T) {
+	t.Run("executes commit-message-check and returns 0", func(t *testing.T) {
 		buffer.Reset()
 
-		_ = writeCommitMsgHook(buffer)
+		status := writeCommitMsgHook(buffer)
 
+		assert.Equal(t, 0, status)
 		assert.Contains(t, buffer.String(), "./commit-message-check validate $1\n")
 	})
 
-	t.Run("returns any error", func(t *testing.T) {
+	t.Run("logs any error and returns 3", func(t *testing.T) {
+		buffer.Reset()
+		log.SetOutput(buffer)
 		errBuffer := mocks.FakeWriter{}
 
-		err := writeCommitMsgHook(errBuffer)
+		status := writeCommitMsgHook(errBuffer)
 
-		assert.NotNil(t, err)
+		assert.Equal(t, 3, status)
+		assert.Contains(t, buffer.String(), "[ERROR]\t Could not write to commit-msg script.")
 	})
 }

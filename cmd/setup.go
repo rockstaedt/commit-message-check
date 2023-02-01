@@ -20,16 +20,15 @@ func Setup(gitPath string) int {
 		return 2
 	}
 
-	_ = writeCommitMsgHook(hookBytes)
-
-	return 0
+	return writeCommitMsgHook(hookBytes)
 }
 
-func writeCommitMsgHook(writer io.Writer) error {
+func writeCommitMsgHook(writer io.Writer) int {
 	_, err := fmt.Fprint(writer, "#!/bin/sh\n\n./commit-message-check validate $1\n")
 	if err != nil {
-		return err
+		log.Println("[ERROR]\t Could not write to commit-msg script.")
+		return 3
 	}
 
-	return nil
+	return 0
 }
