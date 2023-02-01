@@ -39,7 +39,11 @@ func TestSetup(t *testing.T) {
 		assert.Contains(t, buffer.String(), "[ERROR]\t No git repository could be found.")
 	})
 
-	t.Run("returns 2 when error at writing the commit-msg script occurs ", func(t *testing.T) {
+	t.Run("returns 2 when error at creating hook script and logs it", func(t *testing.T) {
+		t.Skip()
+	})
+
+	t.Run("returns 3 when error at writing hook script and logs it", func(t *testing.T) {
 		t.Skip()
 	})
 }
