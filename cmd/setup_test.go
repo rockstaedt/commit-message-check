@@ -40,7 +40,13 @@ func TestSetup(t *testing.T) {
 	})
 
 	t.Run("returns 2 when error at creating hook script and logs it", func(t *testing.T) {
-		t.Skip()
+		buffer.Reset()
+		gitPath := t.TempDir()
+
+		status := Setup(gitPath)
+
+		assert.Equal(t, 2, status)
+		assert.Contains(t, buffer.String(), "[ERROR]\t Could not create commit-msg script.")
 	})
 
 	t.Run("returns 3 when error at writing hook script and logs it", func(t *testing.T) {

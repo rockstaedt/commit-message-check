@@ -14,7 +14,12 @@ func Setup(gitPath string) int {
 		return 1
 	}
 
-	hookBytes, _ := os.Create(fmt.Sprintf("%s/hooks/commit-msg", gitPath))
+	hookBytes, err := os.Create(fmt.Sprintf("%s/hooks/commit-msg", gitPath))
+	if err != nil {
+		log.Println("[ERROR]\t Could not create commit-msg script.")
+		return 2
+	}
+
 	_ = writeCommitMsgHook(hookBytes)
 
 	return 0
