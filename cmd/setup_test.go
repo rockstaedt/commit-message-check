@@ -14,11 +14,16 @@ func TestSetup(t *testing.T) {
 	buffer := &bytes.Buffer{}
 	log.SetOutput(buffer)
 
-	t.Run("returns 0 and init hook script", func(t *testing.T) {
-		gitPath := t.TempDir()
-		hookPath := fmt.Sprintf("%s/hooks", gitPath)
+	gitPath := t.TempDir()
+	hookPath := fmt.Sprintf("%s/hooks", gitPath)
+
+	setup := func() {
 		err := os.Mkdir(hookPath, os.ModePerm)
 		assert.Nil(t, err)
+	}
+
+	t.Run("returns 0 and init hook script", func(t *testing.T) {
+		setup()
 
 		status := Setup(gitPath)
 
@@ -41,9 +46,8 @@ func TestSetup(t *testing.T) {
 
 	t.Run("returns 2 when error at creating hook script and logs it", func(t *testing.T) {
 		buffer.Reset()
-		gitPath := t.TempDir()
 
-		status := Setup(gitPath)
+		status := Setup(t.TempDir())
 
 		assert.Equal(t, 2, status)
 		assert.Contains(t, buffer.String(), "[ERROR]\t Could not create commit-msg script.")
