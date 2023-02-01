@@ -14,7 +14,7 @@ func TestSetup(t *testing.T) {
 	buffer := &bytes.Buffer{}
 	log.SetOutput(buffer)
 
-	setup := func() string {
+	createGitStructure := func() string {
 		gitPath := t.TempDir()
 		err := os.Mkdir(fmt.Sprintf("%s/hooks", gitPath), os.ModePerm)
 		assert.Nil(t, err)
@@ -23,7 +23,7 @@ func TestSetup(t *testing.T) {
 	}
 
 	t.Run("returns 0 and init hook script", func(t *testing.T) {
-		gitPath := setup()
+		gitPath := createGitStructure()
 
 		status := Setup(gitPath)
 
