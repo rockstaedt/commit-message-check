@@ -18,6 +18,10 @@ func TestSetup(t *testing.T) {
 		gitPath := t.TempDir()
 		err := os.Mkdir(fmt.Sprintf("%s/hooks", gitPath), os.ModePerm)
 		assert.Nil(t, err)
+		err = os.MkdirAll(fmt.Sprintf("%s/modules/my_submodule/hooks", gitPath), os.ModePerm)
+		assert.Nil(t, err)
+		err = os.MkdirAll(fmt.Sprintf("%s/modules/joined/submodule2/hooks", gitPath), os.ModePerm)
+		assert.Nil(t, err)
 
 		return gitPath
 	}
@@ -35,6 +39,16 @@ func TestSetup(t *testing.T) {
 		assert.Contains(t, string(contentBytes), "commit-message-check validate")
 	})
 
+	t.Run("returns 0 and init hook scripts also in submodules", func(t *testing.T) {
+		gitPath := createGitStructure()
+
+		status := Setup(gitPath)
+
+		assert.Equal(t, 0, status)
+		assert.FileExists(t, fmt.Sprintf("%s/modules/my_submodule/hooks/commit-msg", gitPath))
+		assert.FileExists(t, fmt.Sprintf("%s/modules/joined/submodule2/hooks/commit-msg", gitPath))
+	})
+
 	t.Run("returns 1 when git repo is not initialized and logs it", func(t *testing.T) {
 		buffer.Reset()
 
@@ -46,11 +60,26 @@ func TestSetup(t *testing.T) {
 
 	t.Run("returns 2 when error at creating hook script and logs it", func(t *testing.T) {
 		buffer.Reset()
+		errPath := t.TempDir()
+		err := os.Mkdir(fmt.Sprintf("%s/not_readable", errPath), 0000)
+		assert.Nil(t, err)
+		err = os.Mkdir(fmt.Sprintf("%s/hooks", errPath), 0000)
+		assert.Nil(t, err)
 
-		status := Setup(t.TempDir())
+		status := Setup(errPath)
 
 		assert.Equal(t, 2, status)
 		assert.Contains(t, buffer.String(), "[ERROR]\t Could not create commit-msg script.")
+	})
+
+	t.Run("returns 2 when .git not readable", func(t *testing.T) {
+		errPath := t.TempDir()
+		err := os.Chmod(errPath, 0000)
+		assert.Nil(t, err)
+
+		status := Setup(errPath)
+
+		assert.Equal(t, 2, status)
 	})
 }
 
@@ -60,29 +89,25 @@ func TestWriteCommitMsgHook(t *testing.T) {
 	t.Run("marks file as shell script and returns 0", func(t *testing.T) {
 		buffer.Reset()
 
-		status := writeCommitMsgHook(buffer)
+		writeCommitMsgHook(buffer)
 
-		assert.Equal(t, 0, status)
 		assert.Contains(t, buffer.String(), "#!/bin/sh\n\n")
 	})
 
-	t.Run("executes commit-message-check and returns 0", func(t *testing.T) {
+	t.Run("executes commit-message-check", func(t *testing.T) {
 		buffer.Reset()
+		
+		writeCommitMsgHook(buffer)
 
-		status := writeCommitMsgHook(buffer)
-
-		assert.Equal(t, 0, status)
 		assert.Contains(t, buffer.String(), "./commit-message-check validate $1\n")
 	})
 
-	t.Run("logs any error and returns 3", func(t *testing.T) {
-		buffer.Reset()
+	t.Run("logs any error", func(t *testing.T) {
 		log.SetOutput(buffer)
 		errBuffer := mocks.FakeWriter{}
 
-		status := writeCommitMsgHook(errBuffer)
+		writeCommitMsgHook(errBuffer)
 
-		assert.Equal(t, 3, status)
-		assert.Contains(t, buffer.String(), "[ERROR]\t Could not write to commit-msg script.")
+		assert.Contains(t, buffer.String(), "[ERROR]\t Could not write commit-msg script: error at writing")
 	})
 }

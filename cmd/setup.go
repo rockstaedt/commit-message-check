@@ -3,8 +3,10 @@ package cmd
 import (
 	"fmt"
 	"io"
+	"io/fs"
 	"log"
 	"os"
+	"path/filepath"
 )
 
 func Setup(gitPath string) int {
@@ -14,21 +16,33 @@ func Setup(gitPath string) int {
 		return 1
 	}
 
-	hookBytes, err := os.Create(fmt.Sprintf("%s/hooks/commit-msg", gitPath))
+	err = filepath.WalkDir(gitPath, func(p string, d fs.DirEntry, e error) error {
+		if e != nil {
+			return e
+		}
+
+		if d.Name() == "hooks" {
+			hookBytes, err := os.Create(fmt.Sprintf("%s/commit-msg", p))
+			if err != nil {
+				return err
+			}
+
+			writeCommitMsgHook(hookBytes)
+		}
+
+		return nil
+	})
 	if err != nil {
 		log.Println("[ERROR]\t Could not create commit-msg script.")
 		return 2
 	}
 
-	return writeCommitMsgHook(hookBytes)
+	return 0
 }
 
-func writeCommitMsgHook(writer io.Writer) int {
+func writeCommitMsgHook(writer io.Writer) {
 	_, err := fmt.Fprint(writer, "#!/bin/sh\n\n./commit-message-check validate $1\n")
 	if err != nil {
-		log.Println("[ERROR]\t Could not write to commit-msg script.")
-		return 3
+		log.Printf("[ERROR]\t Could not write commit-msg script: %s", err)
 	}
-
-	return 0
 }
