@@ -26,7 +26,7 @@ func TestSetup(t *testing.T) {
 		return gitPath
 	}
 
-	t.Run("returns 0 and init hook script", func(t *testing.T) {
+	t.Run("returns 0 and init executable hook script", func(t *testing.T) {
 		gitPath := createGitStructure()
 
 		status := Setup(gitPath)
@@ -37,6 +37,10 @@ func TestSetup(t *testing.T) {
 		contentBytes, err := os.ReadFile(filePath)
 		assert.Nil(t, err)
 		assert.Contains(t, string(contentBytes), "commit-message-check validate")
+		info, err := os.Stat(filePath)
+		assert.Nil(t, err)
+		fmt.Println(info.Mode().String())
+		assert.Equal(t, info.Mode(), os.ModePerm)
 	})
 
 	t.Run("returns 0 and init hook scripts also in submodules", func(t *testing.T) {
@@ -96,7 +100,7 @@ func TestWriteCommitMsgHook(t *testing.T) {
 
 	t.Run("executes commit-message-check", func(t *testing.T) {
 		buffer.Reset()
-		
+
 		writeCommitMsgHook(buffer)
 
 		assert.Contains(t, buffer.String(), "./commit-message-check validate $1\n")

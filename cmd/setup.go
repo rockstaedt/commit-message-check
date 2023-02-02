@@ -22,12 +22,14 @@ func Setup(gitPath string) int {
 		}
 
 		if d.Name() == "hooks" {
-			hookBytes, err := os.Create(fmt.Sprintf("%s/commit-msg", p))
+			file, err := os.Create(fmt.Sprintf("%s/commit-msg", p))
 			if err != nil {
 				return err
 			}
 
-			writeCommitMsgHook(hookBytes)
+			_ = file.Chmod(os.ModePerm)
+
+			writeCommitMsgHook(file)
 		}
 
 		return nil
