@@ -26,31 +26,45 @@ func TestSetup(t *testing.T) {
 		return gitPath
 	}
 
-	t.Run("returns 0 and init executable hook script", func(t *testing.T) {
-		gitPath := createGitStructure()
+	t.Run("returns 0 and", func(t *testing.T) {
 
-		status := Setup(gitPath)
+		t.Run("creates commit-msg script", func(t *testing.T) {
+			gitPath := createGitStructure()
 
-		assert.Equal(t, 0, status)
-		filePath := fmt.Sprintf("%s/hooks/commit-msg", gitPath)
-		assert.FileExists(t, filePath)
-		contentBytes, err := os.ReadFile(filePath)
-		assert.Nil(t, err)
-		assert.Contains(t, string(contentBytes), "commit-message-check validate")
-		info, err := os.Stat(filePath)
-		assert.Nil(t, err)
-		fmt.Println(info.Mode().String())
-		assert.Equal(t, info.Mode(), os.ModePerm)
-	})
+			status := Setup(gitPath)
 
-	t.Run("returns 0 and init hook scripts also in submodules", func(t *testing.T) {
-		gitPath := createGitStructure()
+			assert.Equal(t, 0, status)
+			assert.FileExists(t, fmt.Sprintf("%s/hooks/commit-msg", gitPath))
+		})
 
-		status := Setup(gitPath)
+		t.Run("runs commit-message-check", func(t *testing.T) {
+			gitPath := createGitStructure()
 
-		assert.Equal(t, 0, status)
-		assert.FileExists(t, fmt.Sprintf("%s/modules/my_submodule/hooks/commit-msg", gitPath))
-		assert.FileExists(t, fmt.Sprintf("%s/modules/joined/submodule2/hooks/commit-msg", gitPath))
+			_ = Setup(gitPath)
+
+			contentBytes, err := os.ReadFile(fmt.Sprintf("%s/hooks/commit-msg", gitPath))
+			assert.Nil(t, err)
+			assert.Contains(t, string(contentBytes), "commit-message-check validate")
+		})
+
+		t.Run("makes script executable", func(t *testing.T) {
+			gitPath := createGitStructure()
+
+			_ = Setup(gitPath)
+
+			info, err := os.Stat(fmt.Sprintf("%s/hooks/commit-msg", gitPath))
+			assert.Nil(t, err)
+			assert.Equal(t, info.Mode(), os.ModePerm)
+		})
+
+		t.Run("creates scripts in nested submodules", func(t *testing.T) {
+			gitPath := createGitStructure()
+
+			_ = Setup(gitPath)
+
+			assert.FileExists(t, fmt.Sprintf("%s/modules/my_submodule/hooks/commit-msg", gitPath))
+			assert.FileExists(t, fmt.Sprintf("%s/modules/joined/submodule2/hooks/commit-msg", gitPath))
+		})
 	})
 
 	t.Run("returns 1 when git repo is not initialized and logs it", func(t *testing.T) {
@@ -65,9 +79,7 @@ func TestSetup(t *testing.T) {
 	t.Run("returns 2 when error at creating hook script and logs it", func(t *testing.T) {
 		buffer.Reset()
 		errPath := t.TempDir()
-		err := os.Mkdir(fmt.Sprintf("%s/not_readable", errPath), 0000)
-		assert.Nil(t, err)
-		err = os.Mkdir(fmt.Sprintf("%s/hooks", errPath), 0000)
+		err := os.Mkdir(fmt.Sprintf("%s/hooks", errPath), 0000)
 		assert.Nil(t, err)
 
 		status := Setup(errPath)
