@@ -39,6 +39,7 @@ func Setup(gitPath string) int {
 		return 2
 	}
 
+	log.Println("[SUCCESS]\t commit-message-check successfully installed.")
 	return 0
 }
 

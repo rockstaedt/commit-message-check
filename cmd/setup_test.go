@@ -65,6 +65,15 @@ func TestSetup(t *testing.T) {
 			assert.FileExists(t, fmt.Sprintf("%s/modules/my_submodule/hooks/commit-msg", gitPath))
 			assert.FileExists(t, fmt.Sprintf("%s/modules/joined/submodule2/hooks/commit-msg", gitPath))
 		})
+
+		t.Run("logs a success message", func(t *testing.T) {
+			buffer.Reset()
+			gitPath := createGitStructure()
+
+			_ = Setup(gitPath)
+
+			assert.Contains(t, buffer.String(), "[SUCCESS]\t commit-message-check successfully installed.")
+		})
 	})
 
 	t.Run("returns 1 when git repo is not initialized and logs it", func(t *testing.T) {
