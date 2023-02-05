@@ -7,11 +7,14 @@ import (
 	"log"
 	"os"
 	"rockstaedt/commit-message-check/cmd"
+	"rockstaedt/commit-message-check/util"
 )
 
 var version string
 
 func main() {
+	flag.Usage = util.PrintManual
+
 	var versionFlag bool
 	flag.BoolVar(&versionFlag, "v", false, "Shows the current version of the executable.")
 
@@ -55,7 +58,7 @@ func main() {
 
 		status = cmd.Validate(commitLines)
 	default:
-		fmt.Printf("Unknown subcommand %q. Please check manual.\n", os.Args[1])
+		fmt.Printf("Unknown subcommand %q. Please check manual with -h flag.\n", os.Args[1])
 		status = 4
 	}
 
