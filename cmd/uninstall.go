@@ -13,6 +13,6 @@ func Uninstall(gitPath string) int {
 		return 1
 	}
 
-	log.Println("[SUCCESS]\t Deleted all hook files.")
+	log.Println("[SUCCESS]\t commit-message-check successfully uninstalled.")
 	return 0
 }

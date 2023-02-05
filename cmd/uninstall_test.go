@@ -45,7 +45,7 @@ func TestUninstall(t *testing.T) {
 
 			_ = Uninstall(path)
 
-			assert.Contains(t, buffer.String(), "[SUCCESS]\t Deleted all hook files.")
+			assert.Contains(t, buffer.String(), "[SUCCESS]\t commit-message-check successfully uninstalled.")
 		})
 	})
 
