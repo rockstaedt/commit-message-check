@@ -7,7 +7,10 @@ import (
 
 func Uninstall(gitPath string) int {
 
-	_ = util.WalkHookDirs(gitPath, util.DeleteHook)
+	err := util.WalkHookDirs(gitPath, util.DeleteHook)
+	if err != nil {
+		return 1
+	}
 
 	log.Println("[SUCCESS]\t Deleted all hook files.")
 	return 0

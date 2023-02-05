@@ -47,6 +47,12 @@ func TestUninstall(t *testing.T) {
 	})
 
 	t.Run("returns 1 on any error", func(t *testing.T) {
-		t.Skip()
+		errPath := t.TempDir()
+		err := os.Mkdir(fmt.Sprintf("%s/hooks", errPath), 0000)
+		assert.Nil(t, err)
+
+		status := Uninstall(errPath)
+
+		assert.Equal(t, 1, status)
 	})
 }
