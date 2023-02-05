@@ -42,23 +42,14 @@ func TestSetup(t *testing.T) {
 		})
 	})
 
-	t.Run("returns 1 when git repo is not initialized and logs it", func(t *testing.T) {
-		buffer.Reset()
-
-		status := Setup("/no_existing_git")
-
-		assert.Equal(t, 1, status)
-		assert.Contains(t, buffer.String(), "[ERROR]\t No git repository could be found.")
-	})
-
-	t.Run("returns 2 when error at walking hooks and logs it", func(t *testing.T) {
+	t.Run("returns 1 when error at walking hooks and logs it", func(t *testing.T) {
 		errPath := t.TempDir()
 		err := os.Mkdir(fmt.Sprintf("%s/hooks", errPath), 0000)
 		assert.Nil(t, err)
 
 		status := Setup(errPath)
 
-		assert.Equal(t, 2, status)
+		assert.Equal(t, 1, status)
 		assert.Contains(t, buffer.String(), "[ERROR]\t Could not create commit-msg script.")
 	})
 }

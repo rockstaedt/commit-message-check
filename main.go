@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"rockstaedt/commit-message-check/cmd"
+	"rockstaedt/commit-message-check/util"
 )
 
 var version string
@@ -33,7 +34,13 @@ func main() {
 		log.Printf("[ERROR]\t Could not determine working directory: %q", err.Error())
 		status = 1
 	}
+
 	gitPath := fmt.Sprintf("%s/.git", cwd)
+	if util.IsGitRepo(gitPath) == false {
+		log.Println("[ERROR]\t No git repository could be found.")
+		status = 2
+	}
+
 	switch os.Args[1] {
 	case "setup":
 		status = cmd.Setup(gitPath)
@@ -43,13 +50,13 @@ func main() {
 		commitLines, err := txtreader.GetLinesFromTextFile(os.Args[2])
 		if err != nil {
 			log.Printf("[ERROR]\t Could not read commit message lines: %q", err.Error())
-			status = 1
+			status = 3
 		}
 
 		status = cmd.Validate(commitLines)
 	default:
 		fmt.Printf("Unknown subcommand %q. Please check manual.\n", os.Args[1])
-		status = 1
+		status = 4
 	}
 
 	os.Exit(status)
