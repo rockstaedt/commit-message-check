@@ -41,6 +41,10 @@ func CreateHook(path string) error {
 	return nil
 }
 
+func DeleteHook(path string) error {
+	return nil
+}
+
 func writeContent(writer io.Writer) {
 	_, err := fmt.Fprint(writer, "#!/bin/sh\n\n./commit-message-check validate $1\n")
 	if err != nil {

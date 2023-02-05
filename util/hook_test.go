@@ -107,6 +107,18 @@ func TestCreateHook(t *testing.T) {
 	})
 }
 
+func TestDeleteHook(t *testing.T) {
+	hookPath := t.TempDir()
+
+	t.Run("deletes hook", func(t *testing.T) {
+		_ = DeleteHook(hookPath)
+	})
+
+	t.Run("returns any error", func(t *testing.T) {
+		t.Skip()
+	})
+}
+
 func TestWriteContent(t *testing.T) {
 	buffer := &bytes.Buffer{}
 
