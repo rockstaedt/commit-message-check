@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 )
 
-type DoPathFunc func(path string) error
+type DoPathFunc func(path, exePath string) error
 
 func WalkHookDirs(gitPath string, do DoPathFunc) error {
 	return filepath.WalkDir(gitPath, func(p string, d fs.DirEntry, e error) error {
@@ -18,7 +18,7 @@ func WalkHookDirs(gitPath string, do DoPathFunc) error {
 		}
 
 		if d.Name() == "hooks" {
-			err := do(p)
+			err := do(p, fmt.Sprintf("%s/..", gitPath))
 			if err != nil {
 				return err
 			}
@@ -28,7 +28,7 @@ func WalkHookDirs(gitPath string, do DoPathFunc) error {
 	})
 }
 
-func CreateHook(path string) error {
+func CreateHook(path, exePath string) error {
 	file, err := os.Create(fmt.Sprintf("%s/commit-msg", path))
 	if err != nil {
 		return err
@@ -36,12 +36,12 @@ func CreateHook(path string) error {
 
 	_ = file.Chmod(os.ModePerm)
 
-	writeContent(file)
+	writeContent(file, exePath)
 
 	return nil
 }
 
-func DeleteHook(path string) error {
+func DeleteHook(path, _ string) error {
 	err := os.Remove(fmt.Sprintf("%s/commit-msg", path))
 	if err != nil {
 		return err
@@ -50,8 +50,8 @@ func DeleteHook(path string) error {
 	return nil
 }
 
-func writeContent(writer io.Writer) {
-	_, err := fmt.Fprint(writer, "#!/bin/sh\n\n./commit-message-check validate $1\n")
+func writeContent(writer io.Writer, exePath string) {
+	_, err := fmt.Fprintf(writer, "#!/bin/sh\n\n%s/commit-message-check validate $1\n", exePath)
 	if err != nil {
 		log.Printf("[ERROR]\t Could not write commit-msg script: %s", err)
 	}

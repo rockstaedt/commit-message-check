@@ -25,7 +25,7 @@ func TestWalkHookDirs(t *testing.T) {
 		return path
 	}
 
-	fakeDo := func(path string) error {
+	fakeDo := func(path, exePath string) error {
 		log.Printf("running in %s\n", path)
 
 		return nil
@@ -58,7 +58,7 @@ func TestWalkHookDirs(t *testing.T) {
 		t.Run("on running do func", func(t *testing.T) {
 			path := createDirs()
 			wantedErr := errors.New("error at doing")
-			errDo := func(path string) error {
+			errDo := func(path, exePath string) error {
 				return wantedErr
 			}
 
@@ -73,13 +73,13 @@ func TestCreateHook(t *testing.T) {
 	hookPath := t.TempDir()
 
 	t.Run("creates hook script", func(t *testing.T) {
-		_ = CreateHook(hookPath)
+		_ = CreateHook(hookPath, "root")
 
 		assert.FileExists(t, fmt.Sprintf("%s/commit-msg", hookPath))
 	})
 
 	t.Run("makes script executable", func(t *testing.T) {
-		_ = CreateHook(hookPath)
+		_ = CreateHook(hookPath, "root")
 
 		info, err := os.Stat(fmt.Sprintf("%s/commit-msg", hookPath))
 		assert.Nil(t, err)
@@ -87,11 +87,11 @@ func TestCreateHook(t *testing.T) {
 	})
 
 	t.Run("fills content", func(t *testing.T) {
-		_ = CreateHook(hookPath)
+		_ = CreateHook(hookPath, "root")
 
 		contentBytes, err := os.ReadFile(fmt.Sprintf("%s/commit-msg", hookPath))
 		assert.Nil(t, err)
-		assert.Contains(t, string(contentBytes), "commit-message-check validate")
+		assert.Contains(t, string(contentBytes), "root/commit-message-check validate")
 	})
 
 	t.Run("returns any error", func(t *testing.T) {
@@ -100,7 +100,7 @@ func TestCreateHook(t *testing.T) {
 		err := os.Mkdir(protectedPath, 0000)
 		assert.Nil(t, err)
 
-		err = CreateHook(protectedPath)
+		err = CreateHook(protectedPath, "root")
 
 		assert.NotNil(t, err)
 		assert.Contains(t, err.Error(), "permission denied")
@@ -114,13 +114,13 @@ func TestDeleteHook(t *testing.T) {
 		_, err := os.Create(fmt.Sprintf("%s/commit-msg", hookPath))
 		assert.Nil(t, err)
 
-		_ = DeleteHook(hookPath)
+		_ = DeleteHook(hookPath, "")
 
 		assert.NoFileExists(t, fmt.Sprintf("%s/commit-msg", hookPath))
 	})
 
 	t.Run("returns any error", func(t *testing.T) {
-		err := DeleteHook(hookPath)
+		err := DeleteHook(hookPath, "")
 
 		assert.Contains(t, err.Error(), "no such file")
 	})
@@ -132,24 +132,24 @@ func TestWriteContent(t *testing.T) {
 	t.Run("marks file as shell script and returns 0", func(t *testing.T) {
 		buffer.Reset()
 
-		writeContent(buffer)
+		writeContent(buffer, "usr/tmp")
 
 		assert.Contains(t, buffer.String(), "#!/bin/sh\n\n")
 	})
 
-	t.Run("executes commit-message-check", func(t *testing.T) {
+	t.Run("executes commit-message-check with root path", func(t *testing.T) {
 		buffer.Reset()
 
-		writeContent(buffer)
+		writeContent(buffer, "usr/tmp")
 
-		assert.Contains(t, buffer.String(), "./commit-message-check validate $1\n")
+		assert.Contains(t, buffer.String(), "usr/tmp/commit-message-check validate $1\n")
 	})
 
 	t.Run("logs any error", func(t *testing.T) {
 		log.SetOutput(buffer)
 		errBuffer := mocks.FakeWriter{}
 
-		writeContent(errBuffer)
+		writeContent(errBuffer, "usr/tmp")
 
 		assert.Contains(t, buffer.String(), "[ERROR]\t Could not write commit-msg script: error at writing")
 	})
