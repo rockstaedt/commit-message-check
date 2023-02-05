@@ -120,7 +120,9 @@ func TestDeleteHook(t *testing.T) {
 	})
 
 	t.Run("returns any error", func(t *testing.T) {
-		t.Skip()
+		err := DeleteHook(hookPath)
+
+		assert.Contains(t, err.Error(), "no such file")
 	})
 }
 
