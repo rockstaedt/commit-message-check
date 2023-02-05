@@ -40,13 +40,17 @@ func TestUninstall(t *testing.T) {
 		})
 
 		t.Run("logs a success message", func(t *testing.T) {
-			_ = Uninstall("")
+			buffer.Reset()
+			path := createDirs()
+
+			_ = Uninstall(path)
 
 			assert.Contains(t, buffer.String(), "[SUCCESS]\t Deleted all hook files.")
 		})
 	})
 
 	t.Run("returns 1 on any error", func(t *testing.T) {
+		buffer.Reset()
 		errPath := t.TempDir()
 		err := os.Mkdir(fmt.Sprintf("%s/hooks", errPath), 0000)
 		assert.Nil(t, err)
@@ -54,5 +58,6 @@ func TestUninstall(t *testing.T) {
 		status := Uninstall(errPath)
 
 		assert.Equal(t, 1, status)
+		assert.Contains(t, buffer.String(), "[ERROR]\t Could not delete commit-msg hook.")
 	})
 }
