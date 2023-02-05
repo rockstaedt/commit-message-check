@@ -28,15 +28,17 @@ func main() {
 	}
 
 	var status int
+	cwd, err := os.Getwd()
+	if err != nil {
+		log.Printf("[ERROR]\t Could not determine working directory: %q", err.Error())
+		status = 1
+	}
+	gitPath := fmt.Sprintf("%s/.git", cwd)
 	switch os.Args[1] {
 	case "setup":
-		cwd, err := os.Getwd()
-		if err != nil {
-			log.Printf("[ERROR]\t Could not determine working directory: %q", err.Error())
-			status = 1
-		}
-		
-		status = cmd.Setup(fmt.Sprintf("%s/.git", cwd))
+		status = cmd.Setup(gitPath)
+	case "uninstall":
+		status = cmd.Uninstall(gitPath)
 	case "validate":
 		commitLines, err := txtreader.GetLinesFromTextFile(os.Args[2])
 		if err != nil {
