@@ -42,6 +42,8 @@ func CreateHook(path string) error {
 }
 
 func DeleteHook(path string) error {
+	_ = os.Remove(fmt.Sprintf("%s/commit-msg", path))
+
 	return nil
 }
 

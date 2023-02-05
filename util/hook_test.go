@@ -111,7 +111,12 @@ func TestDeleteHook(t *testing.T) {
 	hookPath := t.TempDir()
 
 	t.Run("deletes hook", func(t *testing.T) {
+		_, err := os.Create(fmt.Sprintf("%s/commit-msg", hookPath))
+		assert.Nil(t, err)
+
 		_ = DeleteHook(hookPath)
+
+		assert.NoFileExists(t, fmt.Sprintf("%s/commit-msg", hookPath))
 	})
 
 	t.Run("returns any error", func(t *testing.T) {
