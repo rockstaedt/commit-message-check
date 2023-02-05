@@ -1,13 +1,17 @@
 package cmd
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/stretchr/testify/assert"
+	"log"
 	"os"
 	"testing"
 )
 
 func TestUninstall(t *testing.T) {
+	buffer := &bytes.Buffer{}
+	log.SetOutput(buffer)
 
 	createDirs := func() string {
 		path := t.TempDir()
@@ -23,14 +27,23 @@ func TestUninstall(t *testing.T) {
 		return path
 	}
 
-	t.Run("returns 0 and removes all occurrences of commit-msg", func(t *testing.T) {
-		path := createDirs()
+	t.Run("returns 0 and", func(t *testing.T) {
 
-		status := Uninstall(path)
+		t.Run("removes all occurrences of commit-msg", func(t *testing.T) {
+			path := createDirs()
 
-		assert.Equal(t, 0, status)
-		assert.NoFileExists(t, fmt.Sprintf("%s/hooks/commit-msg", path))
-		assert.FileExists(t, fmt.Sprintf("%s/xyz/commit-msg", path))
+			status := Uninstall(path)
+
+			assert.Equal(t, 0, status)
+			assert.NoFileExists(t, fmt.Sprintf("%s/hooks/commit-msg", path))
+			assert.FileExists(t, fmt.Sprintf("%s/xyz/commit-msg", path))
+		})
+
+		t.Run("logs a success message", func(t *testing.T) {
+			_ = Uninstall("")
+
+			assert.Contains(t, buffer.String(), "[SUCCESS]\t Deleted all hook files.")
+		})
 	})
 
 	t.Run("returns 1 on any error", func(t *testing.T) {
