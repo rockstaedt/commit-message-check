@@ -7,7 +7,6 @@ import (
 	"log"
 	"os"
 	"rockstaedt/commit-message-check/cmd"
-	"rockstaedt/commit-message-check/util"
 )
 
 var version string
@@ -28,19 +27,20 @@ func main() {
 		os.Exit(1)
 	}
 
-	var status int
 	cwd, err := os.Getwd()
 	if err != nil {
 		log.Printf("[ERROR]\t Could not determine working directory: %q", err.Error())
-		status = 1
+		os.Exit(1)
 	}
 
 	gitPath := fmt.Sprintf("%s/.git", cwd)
-	if util.IsGitRepo(gitPath) == false {
+	_, err = os.Stat(gitPath)
+	if err != nil {
 		log.Println("[ERROR]\t No git repository could be found.")
-		status = 2
+		os.Exit(2)
 	}
 
+	var status int
 	switch os.Args[1] {
 	case "setup":
 		status = cmd.Setup(gitPath)
