@@ -2,6 +2,7 @@ package model
 
 import (
 	"regexp"
+	"strings"
 )
 
 type CommitMessage struct {
@@ -20,6 +21,10 @@ func CreateCommitMessageFrom(messageLines []string) *CommitMessage {
 
 func (cm *CommitMessage) ValidateSubject() int {
 	currentSubjectLength := len(cm.Subject)
+
+	if strings.HasPrefix(cm.Subject, "Merge pull request") {
+		return 0
+	}
 
 	if currentSubjectLength > 72 {
 		return currentSubjectLength - 50

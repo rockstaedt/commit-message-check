@@ -64,6 +64,7 @@ func TestNewCommitMessage(t *testing.T) {
 			{"more than................50................less than 72 characters", 16},
 			{"#1301 - more than........50..............through ID prefix", 0},
 			{"short subject line", 0},
+			{"Merge pull request commits are ignored because they can easily exceed 52 characters", 0},
 		}
 
 		for _, tc := range testcases {
