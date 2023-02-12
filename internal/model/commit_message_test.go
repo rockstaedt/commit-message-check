@@ -1,4 +1,4 @@
-package src
+package model
 
 import (
 	"github.com/stretchr/testify/assert"
@@ -17,8 +17,7 @@ func TestNewCommitMessage(t *testing.T) {
 	}
 
 	t.Run("create new commit message object from File", func(t *testing.T) {
-		cm, err := CreateCommitMessageFrom(validCommitMsgLines)
-		assert.Nil(t, err)
+		cm := CreateCommitMessageFrom(validCommitMsgLines)
 
 		assert.Equal(t, "I am a valid Subject with less than 50 characters", cm.Subject)
 		assert.Len(t, cm.Body, 3)
@@ -27,8 +26,7 @@ func TestNewCommitMessage(t *testing.T) {
 
 	t.Run("Handles empty commit message", func(t *testing.T) {
 		var emptyCommitMsgLines []string
-		cm, err := CreateCommitMessageFrom(emptyCommitMsgLines)
-		assert.Nil(t, err)
+		cm := CreateCommitMessageFrom(emptyCommitMsgLines)
 
 		assert.Equal(t, "", cm.Subject)
 		assert.Len(t, cm.Body, 0)
@@ -40,8 +38,7 @@ func TestNewCommitMessage(t *testing.T) {
 			"body line 1",
 			"body line 2",
 		}
-		cm, err := CreateCommitMessageFrom(invalidCommitMsgLines)
-		assert.Nil(t, err)
+		cm := CreateCommitMessageFrom(invalidCommitMsgLines)
 
 		t.Run("sets body correct", func(t *testing.T) {
 			assert.Equal(t, "subject line", cm.Subject)
@@ -71,7 +68,7 @@ func TestNewCommitMessage(t *testing.T) {
 
 		for _, tc := range testcases {
 			t.Run(getDescFrom(tc.subject), func(t *testing.T) {
-				cm, _ := CreateCommitMessageFrom([]string{tc.subject})
+				cm := CreateCommitMessageFrom([]string{tc.subject})
 
 				aboveSoftLimit := cm.ValidateSubject()
 

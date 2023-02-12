@@ -6,48 +6,63 @@ import (
 	"github.com/rockstaedt/txtreader"
 	"log"
 	"os"
-	"rockstaedt/commit-message-check/src"
-)
-
-const (
-	softLimit = 50
-	hardLimit = 72
+	"rockstaedt/commit-message-check/cmd"
+	"rockstaedt/commit-message-check/util"
 )
 
 var version string
 
 func main() {
-	versionPtr := flag.Bool("v", false, "Prints the current version of the executable")
+	flag.Usage = func() {
+		util.PrintManual(os.Stderr)
+	}
+
+	var versionFlag bool
+	flag.BoolVar(&versionFlag, "v", false, "Shows the current version of the executable.")
+
 	flag.Parse()
 
-	if *versionPtr {
+	if versionFlag {
 		fmt.Println(version)
 		os.Exit(0)
 	}
 
-	log.Println("[INFO]\t Validating commit message...")
-	commitLines, err := txtreader.GetLinesFromTextFile(os.Args[1])
-	if err != nil {
-		log.Printf("[ERROR]\t Could not read commit message lines: %q", err.Error())
+	if len(os.Args) == 1 {
+		fmt.Println("No subcommands given. Please check manual.")
 		os.Exit(1)
 	}
-	cm, err := src.CreateCommitMessageFrom(commitLines)
+
+	cwd, err := os.Getwd()
 	if err != nil {
-		log.Printf("[ERROR]\t Could not create object: %q", err.Error())
+		log.Printf("[ERROR]\t Could not determine working directory: %q", err.Error())
+		os.Exit(1)
+	}
+
+	gitPath := fmt.Sprintf("%s/.git", cwd)
+	_, err = os.Stat(gitPath)
+	if err != nil {
+		log.Println("[ERROR]\t No git repository could be found.")
 		os.Exit(2)
 	}
 
-	numOfExceedingChars := cm.ValidateSubject()
-	if numOfExceedingChars == 0 {
-		os.Exit(0)
+	var status int
+	switch os.Args[1] {
+	case "setup":
+		status = cmd.Setup(gitPath)
+	case "uninstall":
+		status = cmd.Uninstall(gitPath)
+	case "validate":
+		commitLines, err := txtreader.GetLinesFromTextFile(os.Args[2])
+		if err != nil {
+			log.Printf("[ERROR]\t Could not read commit message lines: %q", err.Error())
+			status = 3
+		}
+
+		status = cmd.Validate(commitLines)
+	default:
+		fmt.Printf("Unknown subcommand %q. Please check manual with -h flag.\n", os.Args[1])
+		status = 4
 	}
 
-	if numOfExceedingChars > (hardLimit - softLimit) {
-		log.Println("[ERROR]\t Abort commit. Subject line too long. Please fix.")
-		os.Exit(3)
-	}
-
-	log.Printf("[WARN]\t Your subject exceeds the soft limit of 50 chars by %d chars.", numOfExceedingChars)
-
-	os.Exit(0)
+	os.Exit(status)
 }

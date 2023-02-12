@@ -20,7 +20,7 @@ jobs:
         fetch-depth: 0
     - uses: "WyriHaximus/github-action-get-previous-tag@v1"
       id: previoustag
-    - uses: wangyoucao577/go-release-action@v1.34
+    - uses: wangyoucao577/go-release-action@v1.35
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         goos: ${{ matrix.goos }}
