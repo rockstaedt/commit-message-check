@@ -134,7 +134,7 @@ func TestWriteContent(t *testing.T) {
 
 		writeContent(buffer, "usr/tmp")
 
-		assert.Contains(t, buffer.String(), `#!/bin/sh\n\n`)
+		assert.Contains(t, buffer.String(), "#!/bin/sh\n\n")
 	})
 
 	t.Run("executes commit-message-check with root path and quotes path to handle spaces", func(t *testing.T) {
@@ -142,7 +142,15 @@ func TestWriteContent(t *testing.T) {
 
 		writeContent(buffer, "usr/tmp")
 
-		assert.Contains(t, buffer.String(), `"usr/tmp/commit-message-check" validate $1\n`)
+		assert.Contains(t, buffer.String(), `"usr/tmp/commit-message-check" validate $1`)
+	})
+
+	t.Run("inserts a blank line at the end of file", func(t *testing.T) {
+		buffer.Reset()
+
+		writeContent(buffer, "usr/tmp")
+
+		assert.Contains(t, buffer.String(), "$1\n")
 	})
 
 	t.Run("logs any error", func(t *testing.T) {
