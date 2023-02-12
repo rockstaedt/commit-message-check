@@ -91,7 +91,7 @@ func TestCreateHook(t *testing.T) {
 
 		contentBytes, err := os.ReadFile(fmt.Sprintf("%s/commit-msg", hookPath))
 		assert.Nil(t, err)
-		assert.Contains(t, string(contentBytes), "root/commit-message-check validate")
+		assert.Contains(t, string(contentBytes), `"root/commit-message-check" validate`)
 	})
 
 	t.Run("returns any error", func(t *testing.T) {
@@ -134,15 +134,15 @@ func TestWriteContent(t *testing.T) {
 
 		writeContent(buffer, "usr/tmp")
 
-		assert.Contains(t, buffer.String(), "#!/bin/sh\n\n")
+		assert.Contains(t, buffer.String(), `#!/bin/sh\n\n`)
 	})
 
-	t.Run("executes commit-message-check with root path", func(t *testing.T) {
+	t.Run("executes commit-message-check with root path and quotes path to handle spaces", func(t *testing.T) {
 		buffer.Reset()
 
 		writeContent(buffer, "usr/tmp")
 
-		assert.Contains(t, buffer.String(), "usr/tmp/commit-message-check validate $1\n")
+		assert.Contains(t, buffer.String(), `"usr/tmp/commit-message-check" validate $1\n`)
 	})
 
 	t.Run("logs any error", func(t *testing.T) {
