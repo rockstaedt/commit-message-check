@@ -54,6 +54,7 @@ func writeContent(writer io.Writer, exePath string) {
 	_, err := fmt.Fprint(writer, "#!/bin/sh\n\n")
 	_, err = fmt.Fprintf(writer, `"%s/commit-message-check" validate $1`, exePath)
 	_, err = fmt.Fprint(writer, "\n")
+
 	if err != nil {
 		log.Printf("[ERROR]\t Could not write commit-msg script: %s", err)
 	}
