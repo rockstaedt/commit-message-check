@@ -13,7 +13,9 @@ import (
 var version string
 
 func main() {
-	flag.Usage = util.PrintManual
+	flag.Usage = func() {
+		util.PrintManual(os.Stderr)
+	}
 
 	var versionFlag bool
 	flag.BoolVar(&versionFlag, "v", false, "Shows the current version of the executable.")

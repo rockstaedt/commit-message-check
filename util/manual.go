@@ -1,25 +1,18 @@
 package util
 
 import (
-	"flag"
 	"fmt"
-	"os"
+	"io"
 )
 
-func PrintManual() {
-	_, err := fmt.Fprint(os.Stderr, "Manual for commit-message-check:\n")
-	_, err = fmt.Fprint(os.Stderr, "- Flags:\n")
+func PrintManual(writer io.Writer) {
+	_, _ = fmt.Fprint(writer, "Manual for commit-message-check:\n")
 
-	flag.VisitAll(func(f *flag.Flag) {
-		_, err = fmt.Fprintf(os.Stderr, "\t%s\t\t%v\n", f.Name, f.Usage)
-	})
+	_, _ = fmt.Fprint(writer, "- Flags:\n")
+	_, _ = fmt.Fprint(writer, "\tv\t\tShows the current version of the executable.\n\n")
 
-	_, err = fmt.Fprint(os.Stderr, "- Subcommands:\n")
-	_, err = fmt.Fprint(os.Stderr, "\tsetup\t\tInstalls the commit-msg script in every hook directory.\n")
-	_, err = fmt.Fprint(os.Stderr, "\tuninstall\tRemoves all commit-msg scripts.\n")
-	_, err = fmt.Fprint(os.Stderr, "\tvalidate <PATH>\tValidates the commit message written in <PATH>.\n")
-
-	if err != nil {
-		return
-	}
+	_, _ = fmt.Fprint(writer, "- Subcommands:\n")
+	_, _ = fmt.Fprint(writer, "\tsetup\t\tInstalls the commit-msg script in every hook directory.\n")
+	_, _ = fmt.Fprint(writer, "\tuninstall\tRemoves all commit-msg scripts.\n")
+	_, _ = fmt.Fprint(writer, "\tvalidate <PATH>\tValidates the commit message written in <PATH>.\n")
 }
