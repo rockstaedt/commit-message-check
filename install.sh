@@ -23,7 +23,7 @@ curl -o commit-message-check -L $url && chmod +x ./commit-message-check
 
 if !(grep -Fxq "commit-message-check" .gitignore); then
   read -e -p "Do you want to add the binary to gitignore? (y/n) " choice
-  [[ "$choice" == [Yy]* ]] && echo 'commit-message-check'>>.gitignore
+  [[ "$choice" == [Yy]* ]] && echo "\ncommit-message-check" >> .gitignore
 fi
 
 ./commit-message-check setup
