@@ -22,7 +22,7 @@ func CreateCommitMessageFrom(messageLines []string) *CommitMessage {
 func (cm *CommitMessage) ValidateSubject() int {
 	currentSubjectLength := len(cm.Subject)
 
-	if strings.HasPrefix(cm.Subject, "Merge pull request") {
+	if strings.HasPrefix(cm.Subject, "Merge ") {
 		return 0
 	}
 
