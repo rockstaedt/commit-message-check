@@ -10,7 +10,7 @@ func TestUpdate(t *testing.T) {
 	t.Run("returns 0 and", func(t *testing.T) {
 
 		t.Run("requests latest release tag", func(t *testing.T) {
-			status := Update()
+			status := Update("v1.0.0")
 
 			assert.Equal(t, 0, status)
 		})
