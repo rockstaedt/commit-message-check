@@ -1,13 +1,18 @@
 package cmd
 
-import "testing"
+import (
+	"github.com/stretchr/testify/assert"
+	"testing"
+)
 
 func TestUpdate(t *testing.T) {
 
 	t.Run("returns 0 and", func(t *testing.T) {
 
 		t.Run("requests latest release tag", func(t *testing.T) {
-			t.Skip()
+			status := Update()
+
+			assert.Equal(t, 0, status)
 		})
 
 		t.Run("compares latest tag with local tag", func(t *testing.T) {
