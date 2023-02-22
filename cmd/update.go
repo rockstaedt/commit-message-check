@@ -1,5 +1,5 @@
 package cmd
 
-func Update(_ string) int {
+func Update(_, _ string) int {
 	return 0
 }
