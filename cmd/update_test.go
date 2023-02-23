@@ -39,8 +39,15 @@ func TestUpdate(t *testing.T) {
 		assert.Equal(t, 1, status)
 	})
 
-	t.Run("returns 1 on any error", func(t *testing.T) {
-		t.Skip()
-	})
+	t.Run("returns 2 when", func(t *testing.T) {
 
+		t.Run("response body is empty", func(t *testing.T) {
+			ts := httptest.NewServer(getHandlerFor(""))
+			defer ts.Close()
+
+			status := Update("v1.0.0", ts.URL)
+
+			assert.Equal(t, 2, status)
+		})
+	})
 }

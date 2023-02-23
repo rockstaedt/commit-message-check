@@ -13,7 +13,10 @@ func Update(version, url string) int {
 	res, _ := http.Get(url)
 
 	var data responseData
-	_ = json.NewDecoder(res.Body).Decode(&data)
+	err := json.NewDecoder(res.Body).Decode(&data)
+	if err != nil {
+		return 2
+	}
 
 	if version != data.TagName {
 		return 1
