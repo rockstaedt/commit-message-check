@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -10,12 +9,16 @@ import (
 
 func TestUpdate(t *testing.T) {
 
-	t.Run("returns 0 and a message when local version is latest", func(t *testing.T) {
-		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	getHandlerFor := func(resBody string) http.HandlerFunc {
+		return func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Type", "application/json")
-			_, err := fmt.Fprintln(w, `{"tag_name":"v1.0.0"}`)
+			_, err := w.Write([]byte(resBody))
 			assert.Nil(t, err)
-		}))
+		}
+	}
+
+	t.Run("returns 0 and a message when local version is latest", func(t *testing.T) {
+		ts := httptest.NewServer(getHandlerFor(`{"tag_name":"v1.0.0"}`))
 		defer ts.Close()
 
 		status := Update("v1.0.0", ts.URL)
@@ -28,11 +31,7 @@ func TestUpdate(t *testing.T) {
 	})
 
 	t.Run("returns 1 and no message when a newer version was found", func(t *testing.T) {
-		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set("Content-Type", "application/json")
-			_, err := fmt.Fprintln(w, `{"tag_name":"v1.2.0"}`)
-			assert.Nil(t, err)
-		}))
+		ts := httptest.NewServer(getHandlerFor(`{"tag_name":"v1.2.0"}`))
 		defer ts.Close()
 
 		status := Update("v1.0.0", ts.URL)
