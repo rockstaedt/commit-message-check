@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 )
 
@@ -12,6 +13,7 @@ func Update(version, url string) int {
 		return 1
 	}
 
+	log.Println("Current version is latest version.")
 	return 0
 }
 

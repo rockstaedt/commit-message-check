@@ -1,7 +1,9 @@
 package cmd
 
 import (
+	"bytes"
 	"github.com/stretchr/testify/assert"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -10,12 +12,15 @@ import (
 func TestUpdate(t *testing.T) {
 
 	t.Run("returns 0 and a message when local version is latest", func(t *testing.T) {
+		buffer := &bytes.Buffer{}
+		log.SetOutput(buffer)
 		ts := httptest.NewServer(getHandlerFor(`{"tag_name":"v1.0.0"}`))
 		defer ts.Close()
 
 		status := Update("v1.0.0", ts.URL)
 
 		assert.Equal(t, 0, status)
+		assert.Contains(t, buffer.String(), "Current version is latest version.")
 	})
 
 	t.Run("--downloads install script if newer version available", func(t *testing.T) {
