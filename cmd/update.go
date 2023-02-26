@@ -10,20 +10,23 @@ type responseData struct {
 }
 
 func Update(version, url string) int {
-	res, _ := http.Get(url)
-
-	if res.StatusCode != 200 {
+	res, err := http.Get(url)
+	if err != nil {
 		return 1
 	}
 
-	var data responseData
-	err := json.NewDecoder(res.Body).Decode(&data)
-	if err != nil {
+	if res.StatusCode != 200 {
 		return 2
 	}
 
-	if version != data.TagName {
+	var data responseData
+	err = json.NewDecoder(res.Body).Decode(&data)
+	if err != nil {
 		return 3
+	}
+
+	if version != data.TagName {
+		return 4
 	}
 
 	return 0

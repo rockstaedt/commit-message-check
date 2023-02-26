@@ -36,17 +36,14 @@ func TestUpdate(t *testing.T) {
 		t.Skip()
 	})
 
-	t.Run("return 1 when response status code is not 200", func(t *testing.T) {
-		ts := httptest.NewServer(getHandlerFor("v1.1.1", 500))
-		defer ts.Close()
-
-		status := Update("v1.0.0", ts.URL)
+	t.Run("returns 1 when HTTP protocol error", func(t *testing.T) {
+		status := Update("v1.0.0", "xxx")
 
 		assert.Equal(t, 1, status)
 	})
 
-	t.Run("returns 2 when response body is empty", func(t *testing.T) {
-		ts := httptest.NewServer(getHandlerFor(""))
+	t.Run("returns 2 when response status code is not 200", func(t *testing.T) {
+		ts := httptest.NewServer(getHandlerFor("v1.1.1", 500))
 		defer ts.Close()
 
 		status := Update("v1.0.0", ts.URL)
@@ -54,12 +51,21 @@ func TestUpdate(t *testing.T) {
 		assert.Equal(t, 2, status)
 	})
 
-	t.Run("returns 3 and no message when a newer version was found", func(t *testing.T) {
-		ts := httptest.NewServer(getHandlerFor(`{"tag_name":"v1.2.0"}`))
+	t.Run("returns 3 when response body is empty", func(t *testing.T) {
+		ts := httptest.NewServer(getHandlerFor(""))
 		defer ts.Close()
 
 		status := Update("v1.0.0", ts.URL)
 
 		assert.Equal(t, 3, status)
+	})
+
+	t.Run("returns 4 and no message when a newer version was found", func(t *testing.T) {
+		ts := httptest.NewServer(getHandlerFor(`{"tag_name":"v1.2.0"}`))
+		defer ts.Close()
+
+		status := Update("v1.0.0", ts.URL)
+
+		assert.Equal(t, 4, status)
 	})
 }
