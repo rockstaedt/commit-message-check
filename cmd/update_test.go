@@ -10,10 +10,11 @@ import (
 )
 
 func TestUpdate(t *testing.T) {
+	buffer := &bytes.Buffer{}
+	log.SetOutput(buffer)
 
 	t.Run("returns 0 and a message when local version is latest", func(t *testing.T) {
-		buffer := &bytes.Buffer{}
-		log.SetOutput(buffer)
+		buffer.Reset()
 		ts := httptest.NewServer(getHandlerFor(`{"tag_name":"v1.0.0"}`))
 		defer ts.Close()
 
@@ -27,13 +28,19 @@ func TestUpdate(t *testing.T) {
 		t.Skip()
 	})
 
-	t.Run("returns 1 and no message when a newer version was found", func(t *testing.T) {
-		ts := httptest.NewServer(getHandlerFor(`{"tag_name":"v1.2.0"}`))
+	t.Run("returns 0 and downloads install script if newer version available", func(t *testing.T) {
+		t.Skip()
+	})
+
+	t.Run("returns 1 and message when error at request", func(t *testing.T) {
+		buffer.Reset()
+		ts := httptest.NewServer(getHandlerFor("", 500))
 		defer ts.Close()
 
 		status := Update("v1.0.0", ts.URL)
 
 		assert.Equal(t, 1, status)
+		assert.Contains(t, buffer.String(), "Error at retrieving latest version.")
 	})
 }
 

@@ -8,6 +8,10 @@ import (
 
 func Update(version, url string) int {
 	latestTag := getLatestTag(url)
+	if latestTag == "" {
+		log.Println("Error at retrieving latest version.")
+		return 1
+	}
 
 	if version != latestTag {
 		return 1
