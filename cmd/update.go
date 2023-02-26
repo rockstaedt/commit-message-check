@@ -5,29 +5,35 @@ import (
 	"net/http"
 )
 
+func Update(version, url string) int {
+	latestTag := getLatestTag(url)
+
+	if version != latestTag {
+		return 1
+	}
+
+	return 0
+}
+
 type responseData struct {
 	TagName string `json:"tag_name"`
 }
 
-func Update(version, url string) int {
+func getLatestTag(url string) string {
 	res, err := http.Get(url)
 	if err != nil {
-		return 1
+		return ""
 	}
 
 	if res.StatusCode != 200 {
-		return 2
+		return ""
 	}
 
 	var data responseData
 	err = json.NewDecoder(res.Body).Decode(&data)
 	if err != nil {
-		return 3
+		return ""
 	}
 
-	if version != data.TagName {
-		return 4
-	}
-
-	return 0
+	return data.TagName
 }

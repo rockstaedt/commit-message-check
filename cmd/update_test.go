@@ -9,20 +9,6 @@ import (
 
 func TestUpdate(t *testing.T) {
 
-	getHandlerFor := func(resBody string, statusCode ...int) http.HandlerFunc {
-		sc := 200
-		if len(statusCode) > 0 {
-			sc = statusCode[0]
-		}
-
-		return func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(sc)
-			w.Header().Set("Content-Type", "application/json")
-			_, err := w.Write([]byte(resBody))
-			assert.Nil(t, err)
-		}
-	}
-
 	t.Run("returns 0 and a message when local version is latest", func(t *testing.T) {
 		ts := httptest.NewServer(getHandlerFor(`{"tag_name":"v1.0.0"}`))
 		defer ts.Close()
@@ -36,36 +22,63 @@ func TestUpdate(t *testing.T) {
 		t.Skip()
 	})
 
-	t.Run("returns 1 when HTTP protocol error", func(t *testing.T) {
-		status := Update("v1.0.0", "xxx")
-
-		assert.Equal(t, 1, status)
-	})
-
-	t.Run("returns 2 when response status code is not 200", func(t *testing.T) {
-		ts := httptest.NewServer(getHandlerFor("v1.1.1", 500))
-		defer ts.Close()
-
-		status := Update("v1.0.0", ts.URL)
-
-		assert.Equal(t, 2, status)
-	})
-
-	t.Run("returns 3 when response body is empty", func(t *testing.T) {
-		ts := httptest.NewServer(getHandlerFor(""))
-		defer ts.Close()
-
-		status := Update("v1.0.0", ts.URL)
-
-		assert.Equal(t, 3, status)
-	})
-
-	t.Run("returns 4 and no message when a newer version was found", func(t *testing.T) {
+	t.Run("returns 1 and no message when a newer version was found", func(t *testing.T) {
 		ts := httptest.NewServer(getHandlerFor(`{"tag_name":"v1.2.0"}`))
 		defer ts.Close()
 
 		status := Update("v1.0.0", ts.URL)
 
-		assert.Equal(t, 4, status)
+		assert.Equal(t, 1, status)
 	})
+}
+
+func TestGetLatestTag(t *testing.T) {
+	t.Run("returns latest tag when request is successfully", func(t *testing.T) {
+		ts := httptest.NewServer(getHandlerFor(`{"tag_name":"v1.2.0"}`))
+		defer ts.Close()
+
+		tag := getLatestTag(ts.URL)
+
+		assert.Equal(t, "v1.2.0", tag)
+	})
+
+	t.Run("returns empty string when", func(t *testing.T) {
+
+		t.Run("HTTP protocol error", func(t *testing.T) {
+			tag := getLatestTag("xxx")
+
+			assert.Empty(t, tag)
+		})
+
+		t.Run("response status code is not 200", func(t *testing.T) {
+			ts := httptest.NewServer(getHandlerFor("", 500))
+			defer ts.Close()
+
+			tag := getLatestTag(ts.URL)
+
+			assert.Empty(t, tag)
+		})
+
+		t.Run("response body is empty", func(t *testing.T) {
+			ts := httptest.NewServer(getHandlerFor(""))
+			defer ts.Close()
+
+			tag := getLatestTag(ts.URL)
+
+			assert.Empty(t, tag)
+		})
+	})
+}
+
+func getHandlerFor(resBody string, statusCode ...int) http.HandlerFunc {
+	sc := 200
+	if len(statusCode) > 0 {
+		sc = statusCode[0]
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(sc)
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(resBody))
+	}
 }
