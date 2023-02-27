@@ -4,20 +4,22 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"os"
 )
 
-func Update(version, url string) int {
+func Update(version, url, downloadPath string) int {
 	latestTag := getLatestTag(url)
 	if latestTag == "" {
 		log.Println("Error at retrieving latest version.")
 		return 1
 	}
 
-	if version != latestTag {
-		return 1
+	if version == latestTag {
+		log.Println("Current version is latest version.")
+	} else {
+		os.Create(downloadPath + "/install.sh")
 	}
 
-	log.Println("Current version is latest version.")
 	return 0
 }
 

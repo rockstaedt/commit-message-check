@@ -53,7 +53,7 @@ func main() {
 		status = cmd.Uninstall(gitPath)
 	case "update":
 		url := "https://api.github.com/repos/rockstaedt/commit-message-check/releases/latest"
-		status = cmd.Update(version, url)
+		status = cmd.Update(version, url, cwd)
 	case "validate":
 		commitLines, err := txtreader.GetLinesFromTextFile(os.Args[2])
 		if err != nil {

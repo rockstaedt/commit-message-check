@@ -13,23 +13,28 @@ func TestUpdate(t *testing.T) {
 	buffer := &bytes.Buffer{}
 	log.SetOutput(buffer)
 
-	t.Run("returns 0 and a message when local version is latest", func(t *testing.T) {
-		buffer.Reset()
-		ts := httptest.NewServer(getHandlerFor(`{"tag_name":"v1.0.0"}`))
-		defer ts.Close()
+	t.Run("returns 0 and", func(t *testing.T) {
 
-		status := Update("v1.0.0", ts.URL)
+		t.Run("logs a message when local version is latest", func(t *testing.T) {
+			buffer.Reset()
+			ts := httptest.NewServer(getHandlerFor(`{"tag_name":"v1.0.0"}`))
+			defer ts.Close()
 
-		assert.Equal(t, 0, status)
-		assert.Contains(t, buffer.String(), "Current version is latest version.")
-	})
+			status := Update("v1.0.0", ts.URL, "")
 
-	t.Run("--downloads install script if newer version available", func(t *testing.T) {
-		t.Skip()
-	})
+			assert.Equal(t, 0, status)
+			assert.Contains(t, buffer.String(), "Current version is latest version.")
+		})
 
-	t.Run("returns 0 and downloads install script if newer version available", func(t *testing.T) {
-		t.Skip()
+		t.Run("downloads install script if newer version available", func(t *testing.T) {
+			ts := httptest.NewServer(getHandlerFor(`{"tag_name":"v1.1.0"}`))
+			defer ts.Close()
+			tempDir := t.TempDir()
+
+			_ = Update("v1.0.0", ts.URL, tempDir)
+
+			assert.FileExists(t, tempDir+"/install.sh")
+		})
 	})
 
 	t.Run("returns 1 and message when error at request", func(t *testing.T) {
@@ -37,7 +42,7 @@ func TestUpdate(t *testing.T) {
 		ts := httptest.NewServer(getHandlerFor("", 500))
 		defer ts.Close()
 
-		status := Update("v1.0.0", ts.URL)
+		status := Update("v1.0.0", ts.URL, "")
 
 		assert.Equal(t, 1, status)
 		assert.Contains(t, buffer.String(), "Error at retrieving latest version.")
