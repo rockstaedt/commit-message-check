@@ -34,7 +34,7 @@ func TestUpdate(t *testing.T) {
 
 			_ = Update("v1.0.0", ts.URL, tempDir)
 
-			assert.FileExists(t, tempDir+"/install.sh")
+			assert.FileExists(t, tempDir+"/commit-message-check")
 		})
 	})
 

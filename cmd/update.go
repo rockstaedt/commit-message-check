@@ -46,7 +46,7 @@ func getLatestTag(url string) string {
 }
 
 func downloadScript(downloadPath string) int {
-	_, err := os.Create(downloadPath + "/install.sh")
+	_, err := os.Create(downloadPath + "/commit-message-check")
 	if err != nil {
 		return 1
 	}
