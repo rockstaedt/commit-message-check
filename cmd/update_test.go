@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 )
 
@@ -84,6 +85,20 @@ func TestGetLatestTag(t *testing.T) {
 
 			assert.Empty(t, tag)
 		})
+	})
+}
+
+func TestDownloadScript(t *testing.T) {
+
+	t.Run("returns 1 when error at creating file", func(t *testing.T) {
+		tempDir := t.TempDir()
+		protectedPath := tempDir + "/protected"
+		err := os.Mkdir(protectedPath, 0000)
+		assert.Nil(t, err)
+
+		status := downloadScript(protectedPath)
+
+		assert.Equal(t, 1, status)
 	})
 }
 

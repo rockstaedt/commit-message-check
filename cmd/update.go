@@ -16,11 +16,10 @@ func Update(version, url, downloadPath string) int {
 
 	if version == latestTag {
 		log.Println("Current version is latest version.")
-	} else {
-		os.Create(downloadPath + "/install.sh")
+		return 0
 	}
 
-	return 0
+	return downloadScript(downloadPath)
 }
 
 type responseData struct {
@@ -44,4 +43,13 @@ func getLatestTag(url string) string {
 	}
 
 	return data.TagName
+}
+
+func downloadScript(downloadPath string) int {
+	_, err := os.Create(downloadPath + "/install.sh")
+	if err != nil {
+		return 1
+	}
+
+	return 0
 }
