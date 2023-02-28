@@ -102,7 +102,7 @@ func TestDownloadScript(t *testing.T) {
 		return protectedPath
 	}
 
-	t.Run("returns 0 and downloads binary", func(t *testing.T) {
+	t.Run("returns 0 and writes downloaded binary content to file", func(t *testing.T) {
 		tempDir := t.TempDir()
 		err := os.WriteFile(tempDir+"/dummy", []byte("i am a go binary"), os.ModePerm)
 		assert.Nil(t, err)
