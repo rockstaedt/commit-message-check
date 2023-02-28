@@ -62,14 +62,7 @@ func downloadScript(config *UpdateConfig) int {
 		return 1
 	}
 
-	url := fmt.Sprintf(
-		"%s/commit-message-check-%s-%s-%s",
-		config.BinaryBaseUrl,
-		config.LatestVersion,
-		runtime.GOOS,
-		runtime.GOARCH,
-	)
-	res, err := http.Get(url)
+	res, err := http.Get(getBinaryUrl(config))
 	if err != nil {
 		return 2
 	}
@@ -81,4 +74,14 @@ func downloadScript(config *UpdateConfig) int {
 	_, _ = io.Copy(file, res.Body)
 
 	return 0
+}
+
+func getBinaryUrl(config *UpdateConfig) string {
+	return fmt.Sprintf(
+		"%s/commit-message-check-%s-%s-%s",
+		config.BinaryBaseUrl,
+		config.LatestVersion,
+		runtime.GOOS,
+		runtime.GOARCH,
+	)
 }
