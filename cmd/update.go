@@ -7,19 +7,26 @@ import (
 	"os"
 )
 
-func Update(version, url, downloadPath string) int {
-	latestTag := getLatestTag(url)
+type UpdateConfig struct {
+	Version      string
+	TagUrl       string
+	BinaryUrl    string
+	DownloadPath string
+}
+
+func Update(config *UpdateConfig) int {
+	latestTag := getLatestTag(config.TagUrl)
 	if latestTag == "" {
 		log.Println("Error at retrieving latest version.")
 		return 1
 	}
 
-	if version == latestTag {
+	if config.Version == latestTag {
 		log.Println("Current version is latest version.")
 		return 0
 	}
 
-	return downloadScript(downloadPath)
+	return downloadScript(config)
 }
 
 type responseData struct {
@@ -45,8 +52,8 @@ func getLatestTag(url string) string {
 	return data.TagName
 }
 
-func downloadScript(downloadPath string) int {
-	_, err := os.Create(downloadPath + "/commit-message-check")
+func downloadScript(config *UpdateConfig) int {
+	_, err := os.Create(config.DownloadPath + "/commit-message-check")
 	if err != nil {
 		return 1
 	}

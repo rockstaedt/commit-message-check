@@ -20,8 +20,9 @@ func TestUpdate(t *testing.T) {
 			buffer.Reset()
 			ts := httptest.NewServer(getHandlerFor(`{"tag_name":"v1.0.0"}`))
 			defer ts.Close()
+			config := &UpdateConfig{Version: "v1.0.0", TagUrl: ts.URL}
 
-			status := Update("v1.0.0", ts.URL, "")
+			status := Update(config)
 
 			assert.Equal(t, 0, status)
 			assert.Contains(t, buffer.String(), "Current version is latest version.")
@@ -31,8 +32,9 @@ func TestUpdate(t *testing.T) {
 			ts := httptest.NewServer(getHandlerFor(`{"tag_name":"v1.1.0"}`))
 			defer ts.Close()
 			tempDir := t.TempDir()
+			config := &UpdateConfig{Version: "v1.0.0", TagUrl: ts.URL, DownloadPath: tempDir}
 
-			_ = Update("v1.0.0", ts.URL, tempDir)
+			_ = Update(config)
 
 			assert.FileExists(t, tempDir+"/commit-message-check")
 		})
@@ -42,8 +44,9 @@ func TestUpdate(t *testing.T) {
 		buffer.Reset()
 		ts := httptest.NewServer(getHandlerFor("", 500))
 		defer ts.Close()
+		config := &UpdateConfig{Version: "v1.0.0", TagUrl: ts.URL, DownloadPath: ""}
 
-		status := Update("v1.0.0", ts.URL, "")
+		status := Update(config)
 
 		assert.Equal(t, 1, status)
 		assert.Contains(t, buffer.String(), "Error at retrieving latest version.")
@@ -95,8 +98,9 @@ func TestDownloadScript(t *testing.T) {
 		protectedPath := tempDir + "/protected"
 		err := os.Mkdir(protectedPath, 0000)
 		assert.Nil(t, err)
+		config := &UpdateConfig{DownloadPath: protectedPath}
 
-		status := downloadScript(protectedPath)
+		status := downloadScript(config)
 
 		assert.Equal(t, 1, status)
 	})
