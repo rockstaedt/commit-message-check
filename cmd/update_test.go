@@ -136,6 +136,19 @@ func TestDownloadScript(t *testing.T) {
 
 		assert.Equal(t, 2, status)
 	})
+
+	t.Run("return 3 when request not successfully", func(t *testing.T) {
+		tempDir := t.TempDir()
+		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+			w.WriteHeader(500)
+		}))
+		defer ts.Close()
+		config := &UpdateConfig{DownloadPath: tempDir, BinaryUrl: ts.URL}
+
+		status := downloadScript(config)
+
+		assert.Equal(t, 3, status)
+	})
 }
 
 func getHandlerFor(resBody string, statusCode ...int) http.HandlerFunc {

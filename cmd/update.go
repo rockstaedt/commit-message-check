@@ -64,6 +64,10 @@ func downloadScript(config *UpdateConfig) int {
 		return 2
 	}
 
+	if res.StatusCode != 200 {
+		return 3
+	}
+
 	_, _ = io.Copy(file, res.Body)
 
 	return 0
