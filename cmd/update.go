@@ -2,17 +2,19 @@ package cmd
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"os"
+	"runtime"
 )
 
 type UpdateConfig struct {
-	Version      string
-	TagUrl       string
-	BinaryUrl    string
-	DownloadPath string
+	Version       string
+	TagUrl        string
+	BinaryBaseUrl string
+	DownloadPath  string
 }
 
 func Update(config *UpdateConfig) int {
@@ -59,7 +61,14 @@ func downloadScript(config *UpdateConfig) int {
 		return 1
 	}
 
-	res, err := http.Get(config.BinaryUrl)
+	url := fmt.Sprintf(
+		"%s/commit-message-check-%s-%s-%s",
+		config.BinaryBaseUrl,
+		config.Version,
+		runtime.GOOS,
+		runtime.GOARCH,
+	)
+	res, err := http.Get(url)
 	if err != nil {
 		return 2
 	}

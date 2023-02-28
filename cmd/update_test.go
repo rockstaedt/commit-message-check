@@ -107,10 +107,12 @@ func TestDownloadScript(t *testing.T) {
 		err := os.WriteFile(tempDir+"/dummy", []byte("i am a go binary"), os.ModePerm)
 		assert.Nil(t, err)
 		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			http.ServeFile(w, r, tempDir+"/dummy")
+			if r.URL.String() == "/commit-message-check-v1.1.1-darwin-amd64" {
+				http.ServeFile(w, r, tempDir+"/dummy")
+			}
 		}))
 		defer ts.Close()
-		config := &UpdateConfig{DownloadPath: tempDir, BinaryUrl: ts.URL}
+		config := &UpdateConfig{Version: "v1.1.1", DownloadPath: tempDir, BinaryBaseUrl: ts.URL}
 
 		status := downloadScript(config)
 
@@ -130,7 +132,7 @@ func TestDownloadScript(t *testing.T) {
 
 	t.Run("return 2 when http protocol error", func(t *testing.T) {
 		tempDir := t.TempDir()
-		config := &UpdateConfig{DownloadPath: tempDir, BinaryUrl: "/xxx"}
+		config := &UpdateConfig{DownloadPath: tempDir, BinaryBaseUrl: "/xxx"}
 
 		status := downloadScript(config)
 
@@ -143,7 +145,7 @@ func TestDownloadScript(t *testing.T) {
 			w.WriteHeader(500)
 		}))
 		defer ts.Close()
-		config := &UpdateConfig{DownloadPath: tempDir, BinaryUrl: ts.URL}
+		config := &UpdateConfig{DownloadPath: tempDir, BinaryBaseUrl: ts.URL}
 
 		status := downloadScript(config)
 

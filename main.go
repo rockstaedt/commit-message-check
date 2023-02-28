@@ -53,10 +53,10 @@ func main() {
 		status = cmd.Uninstall(gitPath)
 	case "update":
 		config := &cmd.UpdateConfig{
-			Version:      version,
-			TagUrl:       "https://api.github.com/repos/rockstaedt/commit-message-check/releases/latest",
-			BinaryUrl:    "https://github.com/rockstaedt/commit-message-check/releases/latest/download/",
-			DownloadPath: cwd,
+			Version:       version,
+			TagUrl:        "https://api.github.com/repos/rockstaedt/commit-message-check/releases/latest",
+			BinaryBaseUrl: "https://github.com/rockstaedt/commit-message-check/releases/latest/download/",
+			DownloadPath:  cwd,
 		}
 		status = cmd.Update(config)
 	case "validate":
