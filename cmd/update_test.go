@@ -93,6 +93,15 @@ func TestGetLatestTag(t *testing.T) {
 
 func TestDownloadScript(t *testing.T) {
 
+	getProtectedPath := func(t *testing.T) string {
+		tempDir := t.TempDir()
+		protectedPath := tempDir + "/protected"
+		err := os.Mkdir(protectedPath, 0000)
+		assert.Nil(t, err)
+
+		return protectedPath
+	}
+
 	t.Run("returns 0 and downloads binary", func(t *testing.T) {
 		tempDir := t.TempDir()
 		err := os.WriteFile(tempDir+"/dummy", []byte("i am a go binary"), os.ModePerm)
@@ -112,15 +121,20 @@ func TestDownloadScript(t *testing.T) {
 	})
 
 	t.Run("returns 1 when error at creating file", func(t *testing.T) {
-		tempDir := t.TempDir()
-		protectedPath := tempDir + "/protected"
-		err := os.Mkdir(protectedPath, 0000)
-		assert.Nil(t, err)
-		config := &UpdateConfig{DownloadPath: protectedPath}
+		config := &UpdateConfig{DownloadPath: getProtectedPath(t)}
 
 		status := downloadScript(config)
 
 		assert.Equal(t, 1, status)
+	})
+
+	t.Run("return 2 when http protocol error", func(t *testing.T) {
+		tempDir := t.TempDir()
+		config := &UpdateConfig{DownloadPath: tempDir, BinaryUrl: "/xxx"}
+
+		status := downloadScript(config)
+
+		assert.Equal(t, 2, status)
 	})
 }
 

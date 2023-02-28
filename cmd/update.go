@@ -59,7 +59,10 @@ func downloadScript(config *UpdateConfig) int {
 		return 1
 	}
 
-	res, _ := http.Get(config.BinaryUrl)
+	res, err := http.Get(config.BinaryUrl)
+	if err != nil {
+		return 2
+	}
 
 	_, _ = io.Copy(file, res.Body)
 
