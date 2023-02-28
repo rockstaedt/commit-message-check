@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"encoding/json"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -53,10 +54,14 @@ func getLatestTag(url string) string {
 }
 
 func downloadScript(config *UpdateConfig) int {
-	_, err := os.Create(config.DownloadPath + "/commit-message-check")
+	file, err := os.Create(config.DownloadPath + "/commit-message-check")
 	if err != nil {
 		return 1
 	}
+
+	res, _ := http.Get(config.BinaryUrl)
+
+	_, _ = io.Copy(file, res.Body)
 
 	return 0
 }
