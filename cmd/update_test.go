@@ -112,7 +112,7 @@ func TestDownloadScript(t *testing.T) {
 			}
 		}))
 		defer ts.Close()
-		config := &UpdateConfig{Version: "v1.1.1", DownloadPath: tempDir, BinaryBaseUrl: ts.URL}
+		config := &UpdateConfig{LatestVersion: "v1.1.1", DownloadPath: tempDir, BinaryBaseUrl: ts.URL}
 
 		status := downloadScript(config)
 

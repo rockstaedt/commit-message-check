@@ -12,19 +12,20 @@ import (
 
 type UpdateConfig struct {
 	Version       string
+	LatestVersion string
 	TagUrl        string
 	BinaryBaseUrl string
 	DownloadPath  string
 }
 
 func Update(config *UpdateConfig) int {
-	latestTag := getLatestTag(config.TagUrl)
-	if latestTag == "" {
+	config.LatestVersion = getLatestTag(config.TagUrl)
+	if config.LatestVersion == "" {
 		log.Println("Error at retrieving latest version.")
 		return 1
 	}
 
-	if config.Version == latestTag {
+	if config.Version == config.LatestVersion {
 		log.Println("Current version is latest version.")
 		return 0
 	}
@@ -64,7 +65,7 @@ func downloadScript(config *UpdateConfig) int {
 	url := fmt.Sprintf(
 		"%s/commit-message-check-%s-%s-%s",
 		config.BinaryBaseUrl,
-		config.Version,
+		config.LatestVersion,
 		runtime.GOOS,
 		runtime.GOARCH,
 	)
