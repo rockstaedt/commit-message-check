@@ -18,6 +18,10 @@ type UpdateConfig struct {
 	DownloadPath  string
 }
 
+type responseData struct {
+	TagName string `json:"tag_name"`
+}
+
 func Update(config *UpdateConfig) int {
 	config.LatestVersion = getLatestTag(config.TagUrl)
 	if config.LatestVersion == "" {
@@ -31,10 +35,6 @@ func Update(config *UpdateConfig) int {
 	}
 
 	return downloadScript(config)
-}
-
-type responseData struct {
-	TagName string `json:"tag_name"`
 }
 
 func getLatestTag(url string) string {
