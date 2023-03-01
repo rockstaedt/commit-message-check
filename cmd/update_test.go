@@ -2,12 +2,14 @@ package cmd
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"rockstaedt/commit-message-check/internal/model"
+	"runtime"
 	"testing"
 )
 
@@ -121,7 +123,8 @@ func TestDownloadScript(t *testing.T) {
 		err := os.WriteFile(tempDir+"/dummy", []byte("i am a go binary"), os.ModePerm)
 		assert.Nil(t, err)
 		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if r.URL.String() == "/commit-message-check-v1.1.1-darwin-amd64" {
+			targetUrl := fmt.Sprintf("/commit-message-check-v1.1.1-%s-%s", runtime.GOOS, runtime.GOARCH)
+			if r.URL.String() == targetUrl {
 				http.ServeFile(w, r, tempDir+"/dummy")
 			}
 		}))
