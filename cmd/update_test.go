@@ -92,6 +92,19 @@ func TestGetLatestTag(t *testing.T) {
 	})
 }
 
+func getHandlerFor(resBody string, statusCode ...int) http.HandlerFunc {
+	sc := 200
+	if len(statusCode) > 0 {
+		sc = statusCode[0]
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(sc)
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(resBody))
+	}
+}
+
 func TestDownloadScript(t *testing.T) {
 
 	getProtectedPath := func(t *testing.T) string {
@@ -152,17 +165,4 @@ func TestDownloadScript(t *testing.T) {
 
 		assert.Equal(t, 3, status)
 	})
-}
-
-func getHandlerFor(resBody string, statusCode ...int) http.HandlerFunc {
-	sc := 200
-	if len(statusCode) > 0 {
-		sc = statusCode[0]
-	}
-
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(sc)
-		w.Header().Set("Content-Type", "application/json")
-		_, _ = w.Write([]byte(resBody))
-	}
 }
