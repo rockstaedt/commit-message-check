@@ -59,10 +59,14 @@ func main() {
 			BinaryBaseUrl: "https://github.com/rockstaedt/commit-message-check/releases/latest/download/",
 			DownloadPath:  cwd,
 		}
+
 		status = cmd.Update(config)
+
 		if status > 0 {
-			log.Println("[ERROR]\t Could not update binary.")
+			log.Println("[ERROR]\t Could not update commit-message-check.")
+			break
 		}
+		log.Printf("[SUCCESS]\t Updated commit-message-check successfully to %s", config.LatestVersion)
 	case "validate":
 		commitLines, err := txtreader.GetLinesFromTextFile(os.Args[2])
 		if err != nil {
