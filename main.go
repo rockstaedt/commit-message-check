@@ -60,6 +60,9 @@ func main() {
 			DownloadPath:  cwd,
 		}
 		status = cmd.Update(config)
+		if status > 0 {
+			log.Println("[ERROR]\t Could not update binary.")
+		}
 	case "validate":
 		commitLines, err := txtreader.GetLinesFromTextFile(os.Args[2])
 		if err != nil {
