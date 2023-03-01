@@ -7,22 +7,15 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"rockstaedt/commit-message-check/internal/model"
 	"runtime"
 )
-
-type UpdateConfig struct {
-	Version       string
-	LatestVersion string
-	TagUrl        string
-	BinaryBaseUrl string
-	DownloadPath  string
-}
 
 type responseData struct {
 	TagName string `json:"tag_name"`
 }
 
-func Update(config *UpdateConfig) int {
+func Update(config *model.UpdateConfig) int {
 	config.LatestVersion = getLatestTag(config.TagUrl)
 	if config.LatestVersion == "" {
 		log.Println("Error at retrieving latest version.")
@@ -56,7 +49,7 @@ func getLatestTag(url string) string {
 	return data.TagName
 }
 
-func downloadScript(config *UpdateConfig) int {
+func downloadScript(config *model.UpdateConfig) int {
 	file, err := os.Create(config.DownloadPath + "/commit-message-check")
 	if err != nil {
 		return 1
@@ -76,7 +69,7 @@ func downloadScript(config *UpdateConfig) int {
 	return 0
 }
 
-func getBinaryUrl(config *UpdateConfig) string {
+func getBinaryUrl(config *model.UpdateConfig) string {
 	return fmt.Sprintf(
 		"%s/commit-message-check-%s-%s-%s",
 		config.BinaryBaseUrl,
