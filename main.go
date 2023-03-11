@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"rockstaedt/commit-message-check/cmd"
+	"rockstaedt/commit-message-check/internal/model"
 	"rockstaedt/commit-message-check/util"
 )
 
@@ -51,6 +52,21 @@ func main() {
 		status = cmd.Setup(gitPath)
 	case "uninstall":
 		status = cmd.Uninstall(gitPath)
+	case "update":
+		config := &model.UpdateConfig{
+			Version:       version,
+			TagUrl:        "https://api.github.com/repos/rockstaedt/commit-message-check/releases/latest",
+			BinaryBaseUrl: "https://github.com/rockstaedt/commit-message-check/releases/latest/download/",
+			DownloadPath:  cwd,
+		}
+
+		status = cmd.Update(config)
+
+		if status > 0 {
+			log.Println("[ERROR]\t Could not update commit-message-check.")
+			break
+		}
+		log.Printf("[SUCCESS]\t Updated commit-message-check successfully to %s", config.LatestVersion)
 	case "validate":
 		commitLines, err := txtreader.GetLinesFromTextFile(os.Args[2])
 		if err != nil {

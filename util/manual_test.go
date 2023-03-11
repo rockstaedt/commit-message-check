@@ -68,6 +68,15 @@ func TestPrintManual(t *testing.T) {
 				assert.Contains(t, buffer.String(), msg)
 			})
 
+			t.Run("update", func(t *testing.T) {
+				buffer.Reset()
+
+				PrintManual(buffer)
+
+				msg := "\tupdate\t\tUpdates the binary to the latest version.\n"
+				assert.Contains(t, buffer.String(), msg)
+			})
+
 			t.Run("validate", func(t *testing.T) {
 				buffer.Reset()
 

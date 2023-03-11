@@ -14,5 +14,6 @@ func PrintManual(writer io.Writer) {
 	_, _ = fmt.Fprint(writer, "- Subcommands:\n")
 	_, _ = fmt.Fprint(writer, "\tsetup\t\tInstalls the commit-msg script in every hook directory.\n")
 	_, _ = fmt.Fprint(writer, "\tuninstall\tRemoves all commit-msg scripts.\n")
+	_, _ = fmt.Fprint(writer, "\tupdate\t\tUpdates the binary to the latest version.\n")
 	_, _ = fmt.Fprint(writer, "\tvalidate <PATH>\tValidates the commit message written in <PATH>.\n")
 }
