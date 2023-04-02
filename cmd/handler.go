@@ -31,5 +31,7 @@ func (h *Handler) Run() {
 		}
 
 		Validate(commitLines)
+	default:
+		log.Println("Unknown subcommand. Please check manual.")
 	}
 }

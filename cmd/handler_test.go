@@ -73,6 +73,13 @@ func TestHandler(t *testing.T) {
 	})
 
 	t.Run("prints warning when any other command", func(t *testing.T) {
-		t.Skip()
+		buffer.Reset()
+		config := model.Config{Command: "unknown"}
+		myHandler := NewHandler(config)
+
+		myHandler.Run()
+
+		want := "Unknown subcommand. Please check manual."
+		assert.Contains(t, buffer.String(), want)
 	})
 }
