@@ -18,19 +18,24 @@ func TestHandler(t *testing.T) {
 		config := model.Config{Command: "uninstall", GitPath: "/"}
 		myHandler := NewHandler(config)
 
-		myHandler.Run()
+		status := myHandler.Run()
 
 		assert.Contains(t, buffer.String(), "Could not delete")
+		assert.True(t, status > 0)
 	})
 
 	t.Run("executes setup command", func(t *testing.T) {
 		buffer.Reset()
-		config := model.Config{Command: "setup", GitPath: t.TempDir()}
+		protectedPath := t.TempDir() + "/fake"
+		err := os.Mkdir(protectedPath, 0000)
+		assert.Nil(t, err)
+		config := model.Config{Command: "setup", GitPath: protectedPath}
 		myHandler := NewHandler(config)
 
-		myHandler.Run()
+		status := myHandler.Run()
 
-		assert.Contains(t, buffer.String(), "successfully")
+		assert.Contains(t, buffer.String(), "Could not create")
+		assert.True(t, status > 0)
 	})
 
 	t.Run("executes update command", func(t *testing.T) {
@@ -38,9 +43,10 @@ func TestHandler(t *testing.T) {
 		config := model.Config{Command: "update"}
 		myHandler := NewHandler(config)
 
-		myHandler.Run()
+		status := myHandler.Run()
 
 		assert.Contains(t, buffer.String(), "Error at retrieving")
+		assert.True(t, status > 0)
 	})
 
 	t.Run("executes validate command", func(t *testing.T) {
@@ -64,11 +70,12 @@ func TestHandler(t *testing.T) {
 			config := model.Config{Command: "validate", CommitMsg: "/no_file"}
 			myHandler := NewHandler(config)
 
-			myHandler.Run()
+			status := myHandler.Run()
 
 			want := `Could not read commit message: "file not found"`
 			assert.Contains(t, buffer.String(), want)
 			assert.NotContains(t, buffer.String(), "Valid")
+			assert.Equal(t, 3, status)
 		})
 	})
 
@@ -77,9 +84,10 @@ func TestHandler(t *testing.T) {
 		config := model.Config{Command: "unknown"}
 		myHandler := NewHandler(config)
 
-		myHandler.Run()
+		status := myHandler.Run()
 
 		want := "Unknown subcommand. Please check manual."
 		assert.Contains(t, buffer.String(), want)
+		assert.Equal(t, 4, status)
 	})
 }

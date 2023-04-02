@@ -14,24 +14,28 @@ func NewHandler(config model.Config) *Handler {
 	return &Handler{Config: config}
 }
 
-func (h *Handler) Run() {
+func (h *Handler) Run() int {
 
+	var status int
 	switch h.Config.Command {
 	case "setup":
-		Setup(h.Config.GitPath)
+		status = Setup(h.Config.GitPath)
 	case "uninstall":
-		Uninstall(h.Config.GitPath)
+		status = Uninstall(h.Config.GitPath)
 	case "update":
-		Update(&h.Config)
+		status = Update(&h.Config)
 	case "validate":
 		commitLines, err := txtreader.GetLinesFromTextFile(h.Config.CommitMsg)
 		if err != nil {
 			log.Printf("Could not read commit message: %q", err.Error())
-			break
+			return 3
 		}
 
 		Validate(commitLines)
 	default:
 		log.Println("Unknown subcommand. Please check manual.")
+		return 4
 	}
+
+	return status
 }
