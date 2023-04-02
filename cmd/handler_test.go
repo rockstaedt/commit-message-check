@@ -33,7 +33,13 @@ func TestHandler(t *testing.T) {
 	})
 
 	t.Run("executes update command", func(t *testing.T) {
-		t.Skip()
+		buffer.Reset()
+		config := model.Config{Command: "update"}
+		myHandler := NewHandler(config)
+
+		myHandler.Run()
+
+		assert.Contains(t, buffer.String(), "Error at retrieving")
 	})
 
 	t.Run("executes validate command", func(t *testing.T) {

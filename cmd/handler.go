@@ -12,9 +12,12 @@ func NewHandler(config model.Config) *Handler {
 
 func (h *Handler) Run() {
 
-	if h.Config.Command == "setup" {
+	switch h.Config.Command {
+	case "setup":
 		Setup(h.Config.GitPath)
+	case "uninstall":
+		Uninstall(h.Config.GitPath)
+	case "update":
+		Update(&h.Config)
 	}
-
-	Uninstall(h.Config.GitPath)
 }
