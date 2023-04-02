@@ -11,5 +11,10 @@ func NewHandler(config model.Config) *Handler {
 }
 
 func (h *Handler) Run() {
+
+	if h.Config.Command == "setup" {
+		Setup(h.Config.GitPath)
+	}
+
 	Uninstall(h.Config.GitPath)
 }

@@ -9,10 +9,11 @@ import (
 )
 
 func TestHandler(t *testing.T) {
+	buffer := &bytes.Buffer{}
+	log.SetOutput(buffer)
 
 	t.Run("executes uninstall command", func(t *testing.T) {
-		buffer := &bytes.Buffer{}
-		log.SetOutput(buffer)
+		buffer.Reset()
 		config := model.Config{Command: "uninstall", GitPath: "/"}
 		myHandler := NewHandler(config)
 
@@ -22,7 +23,13 @@ func TestHandler(t *testing.T) {
 	})
 
 	t.Run("executes setup command", func(t *testing.T) {
-		t.Skip()
+		buffer.Reset()
+		config := model.Config{Command: "setup", GitPath: t.TempDir()}
+		myHandler := NewHandler(config)
+
+		myHandler.Run()
+
+		assert.Contains(t, buffer.String(), "successfully")
 	})
 
 	t.Run("executes update command", func(t *testing.T) {
