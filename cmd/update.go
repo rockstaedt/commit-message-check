@@ -66,6 +66,11 @@ func downloadScript(config *model.Config) int {
 
 	_, _ = io.Copy(file, res.Body)
 
+	log.Printf(
+		"[SUCCESS]\t Updated commit-message-check successfully to %s",
+		config.LatestVersion,
+	)
+
 	return 0
 }
 

@@ -119,6 +119,8 @@ func TestDownloadScript(t *testing.T) {
 	}
 
 	t.Run("returns 0 and writes downloaded binary content to file", func(t *testing.T) {
+		buffer := &bytes.Buffer{}
+		log.SetOutput(buffer)
 		tempDir := t.TempDir()
 		err := os.WriteFile(tempDir+"/dummy", []byte("i am a go binary"), os.ModePerm)
 		assert.Nil(t, err)
@@ -137,6 +139,9 @@ func TestDownloadScript(t *testing.T) {
 		contentBytes, err := os.ReadFile(tempDir + "/commit-message-check")
 		assert.Nil(t, err)
 		assert.Contains(t, string(contentBytes), "i am a go binary")
+		wantedUpdateMsg := "[SUCCESS]\t Updated commit-message-check " +
+			"successfully to v1.1.1"
+		assert.Contains(t, buffer.String(), wantedUpdateMsg)
 	})
 
 	t.Run("returns 1 when error at creating file", func(t *testing.T) {
