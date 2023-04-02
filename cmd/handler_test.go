@@ -1,11 +1,15 @@
 package cmd
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestHandler(t *testing.T) {
 
 	t.Run("executes uninstall command", func(t *testing.T) {
-		t.Skip()
+		myHandler := NewHandler("uninstall")
+
+		myHandler.Run()
 	})
 
 	t.Run("executes setup command", func(t *testing.T) {
