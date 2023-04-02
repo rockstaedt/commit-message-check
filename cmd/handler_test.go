@@ -53,8 +53,7 @@ func TestHandler(t *testing.T) {
 
 		t.Run("success", func(t *testing.T) {
 			buffer.Reset()
-			dir := t.TempDir()
-			testFile := dir + "/text.txt"
+			testFile := t.TempDir() + "/text.txt"
 			err := os.WriteFile(testFile, []byte("i am a commit msg"), 0666)
 			assert.Nil(t, err)
 			config := model.Config{Command: "validate", CommitMsg: testFile}
@@ -63,6 +62,21 @@ func TestHandler(t *testing.T) {
 			myHandler.Run()
 
 			assert.Contains(t, buffer.String(), "Valid commit message")
+		})
+
+		t.Run("commit msg too long aborts handler", func(t *testing.T) {
+			testFile := t.TempDir() + "/text.txt"
+			content := "waaaaaaaaaaaaaaaaaaaaaaaaaay tooooooooooooooooooo" +
+				"looooooooooooooooooooooong"
+			err := os.WriteFile(testFile, []byte(content), 0666)
+			assert.Nil(t, err)
+			config := model.Config{Command: "validate", CommitMsg: testFile}
+			myHandler := NewHandler(config)
+
+			status := myHandler.Run()
+
+			assert.Contains(t, buffer.String(), "Valid commit message")
+			assert.Equal(t, 1, status)
 		})
 
 		t.Run("error at reading file", func(t *testing.T) {
