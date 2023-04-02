@@ -11,5 +11,5 @@ func NewHandler(config model.Config) *Handler {
 }
 
 func (h *Handler) Run() {
-
+	Uninstall(h.Config.GitPath)
 }
