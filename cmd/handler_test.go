@@ -65,6 +65,7 @@ func TestHandler(t *testing.T) {
 		})
 
 		t.Run("commit msg too long aborts handler", func(t *testing.T) {
+			buffer.Reset()
 			testFile := t.TempDir() + "/text.txt"
 			content := "waaaaaaaaaaaaaaaaaaaaaaaaaay tooooooooooooooooooo" +
 				"looooooooooooooooooooooong"
@@ -75,7 +76,7 @@ func TestHandler(t *testing.T) {
 
 			status := myHandler.Run()
 
-			assert.Contains(t, buffer.String(), "Valid commit message")
+			assert.Contains(t, buffer.String(), "Abort commit")
 			assert.Equal(t, 1, status)
 		})
 
