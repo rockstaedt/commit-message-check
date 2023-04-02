@@ -1,6 +1,10 @@
 package cmd
 
-import "rockstaedt/commit-message-check/internal/model"
+import (
+	"github.com/rockstaedt/txtreader"
+	"os"
+	"rockstaedt/commit-message-check/internal/model"
+)
 
 type Handler struct {
 	Config model.Config
@@ -19,5 +23,9 @@ func (h *Handler) Run() {
 		Uninstall(h.Config.GitPath)
 	case "update":
 		Update(&h.Config)
+	case "validate":
+		commitLines, _ := txtreader.GetLinesFromTextFile(os.Args[2])
+
+		Validate(commitLines)
 	}
 }

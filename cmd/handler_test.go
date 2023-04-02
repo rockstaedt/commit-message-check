@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"github.com/stretchr/testify/assert"
 	"log"
+	"os"
 	"rockstaedt/commit-message-check/internal/model"
 	"testing"
 )
@@ -43,7 +44,17 @@ func TestHandler(t *testing.T) {
 	})
 
 	t.Run("executes validate command", func(t *testing.T) {
-		t.Skip()
+		buffer.Reset()
+		dir := t.TempDir()
+		testFile := dir + "/text.txt"
+		err := os.WriteFile(testFile, []byte("i am a commit msg"), 0666)
+		assert.Nil(t, err)
+		config := model.Config{Command: "validate", CommitMsg: testFile}
+		myHandler := NewHandler(config)
+
+		myHandler.Run()
+
+		assert.Contains(t, buffer.String(), "Valid commit message")
 	})
 
 	t.Run("prints warning when any other command", func(t *testing.T) {
