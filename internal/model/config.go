@@ -6,4 +6,6 @@ type Config struct {
 	TagUrl        string
 	BinaryBaseUrl string
 	DownloadPath  string
+	GitPath       string
+	Command       string
 }

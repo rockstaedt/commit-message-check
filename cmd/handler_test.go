@@ -1,13 +1,15 @@
 package cmd
 
 import (
+	"rockstaedt/commit-message-check/internal/model"
 	"testing"
 )
 
 func TestHandler(t *testing.T) {
 
 	t.Run("executes uninstall command", func(t *testing.T) {
-		myHandler := NewHandler("uninstall")
+		config := model.Config{Command: "uninstall", GitPath: "/:"}
+		myHandler := NewHandler(config)
 
 		myHandler.Run()
 	})

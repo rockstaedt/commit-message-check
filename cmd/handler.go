@@ -1,11 +1,13 @@
 package cmd
 
+import "rockstaedt/commit-message-check/internal/model"
+
 type Handler struct {
-	Command string
+	Config model.Config
 }
 
-func NewHandler(command string) *Handler {
-	return &Handler{Command: command}
+func NewHandler(config model.Config) *Handler {
+	return &Handler{Config: config}
 }
 
 func (h *Handler) Run() {
