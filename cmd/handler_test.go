@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func TestHandler(t *testing.T) {
+func TestRun(t *testing.T) {
 	buffer := &bytes.Buffer{}
 	log.SetOutput(buffer)
 
