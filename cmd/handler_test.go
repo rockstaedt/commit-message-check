@@ -13,7 +13,7 @@ func TestHandler(t *testing.T) {
 	t.Run("executes uninstall command", func(t *testing.T) {
 		buffer := &bytes.Buffer{}
 		log.SetOutput(buffer)
-		config := model.Config{Command: "uninstall", GitPath: "/:"}
+		config := model.Config{Command: "uninstall", GitPath: "/"}
 		myHandler := NewHandler(config)
 
 		myHandler.Run()
