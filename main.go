@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/rockstaedt/txtreader"
 	"log"
 	"os"
 	"rockstaedt/commit-message-check/cmd"
@@ -46,39 +45,22 @@ func main() {
 		os.Exit(2)
 	}
 
-	var status int
-	switch os.Args[1] {
-	case "setup":
-		status = cmd.Setup(gitPath)
-	case "uninstall":
-		status = cmd.Uninstall(gitPath)
-	case "update":
-		config := &model.Config{
-			Version:       version,
-			TagUrl:        "https://api.github.com/repos/rockstaedt/commit-message-check/releases/latest",
-			BinaryBaseUrl: "https://github.com/rockstaedt/commit-message-check/releases/latest/download/",
-			DownloadPath:  cwd,
-		}
-
-		status = cmd.Update(config)
-
-		if status > 0 {
-			log.Println("[ERROR]\t Could not update commit-message-check.")
-			break
-		}
-		log.Printf("[SUCCESS]\t Updated commit-message-check successfully to %s", config.LatestVersion)
-	case "validate":
-		commitLines, err := txtreader.GetLinesFromTextFile(os.Args[2])
-		if err != nil {
-			log.Printf("[ERROR]\t Could not read commit message lines: %q", err.Error())
-			status = 3
-		}
-
-		status = cmd.Validate(commitLines)
-	default:
-		fmt.Printf("Unknown subcommand %q. Please check manual with -h flag.\n", os.Args[1])
-		status = 4
+	var commitMsg string
+	if len(os.Args) == 3 {
+		commitMsg = os.Args[2]
 	}
 
-	os.Exit(status)
+	config := model.Config{
+		Command:       os.Args[1],
+		CommitMsg:     commitMsg,
+		GitPath:       gitPath,
+		Version:       version,
+		TagUrl:        "https://api.github.com/repos/rockstaedt/commit-message-check/releases/latest",
+		BinaryBaseUrl: "https://github.com/rockstaedt/commit-message-check/releases/latest/download/",
+		DownloadPath:  cwd,
+	}
+
+	handler := cmd.NewHandler(config)
+
+	os.Exit(handler.Run())
 }
