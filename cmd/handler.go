@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"github.com/rockstaedt/txtreader"
-	"os"
+	"log"
 	"rockstaedt/commit-message-check/internal/model"
 )
 
@@ -24,7 +24,11 @@ func (h *Handler) Run() {
 	case "update":
 		Update(&h.Config)
 	case "validate":
-		commitLines, _ := txtreader.GetLinesFromTextFile(os.Args[2])
+		commitLines, err := txtreader.GetLinesFromTextFile(h.Config.CommitMsg)
+		if err != nil {
+			log.Printf("Could not read commit message: %q", err.Error())
+			break
+		}
 
 		Validate(commitLines)
 	}
