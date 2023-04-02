@@ -53,7 +53,7 @@ func main() {
 	case "uninstall":
 		status = cmd.Uninstall(gitPath)
 	case "update":
-		config := &model.UpdateConfig{
+		config := &model.Config{
 			Version:       version,
 			TagUrl:        "https://api.github.com/repos/rockstaedt/commit-message-check/releases/latest",
 			BinaryBaseUrl: "https://github.com/rockstaedt/commit-message-check/releases/latest/download/",

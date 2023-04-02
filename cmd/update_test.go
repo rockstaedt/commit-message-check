@@ -23,7 +23,7 @@ func TestUpdate(t *testing.T) {
 			buffer.Reset()
 			ts := httptest.NewServer(getHandlerFor(`{"tag_name":"v1.0.0"}`))
 			defer ts.Close()
-			config := &model.UpdateConfig{Version: "v1.0.0", TagUrl: ts.URL}
+			config := &model.Config{Version: "v1.0.0", TagUrl: ts.URL}
 
 			status := Update(config)
 
@@ -35,7 +35,7 @@ func TestUpdate(t *testing.T) {
 			ts := httptest.NewServer(getHandlerFor(`{"tag_name":"v1.1.0"}`))
 			defer ts.Close()
 			tempDir := t.TempDir()
-			config := &model.UpdateConfig{Version: "v1.0.0", TagUrl: ts.URL, DownloadPath: tempDir}
+			config := &model.Config{Version: "v1.0.0", TagUrl: ts.URL, DownloadPath: tempDir}
 
 			_ = Update(config)
 
@@ -47,7 +47,7 @@ func TestUpdate(t *testing.T) {
 		buffer.Reset()
 		ts := httptest.NewServer(getHandlerFor("", 500))
 		defer ts.Close()
-		config := &model.UpdateConfig{Version: "v1.0.0", TagUrl: ts.URL, DownloadPath: ""}
+		config := &model.Config{Version: "v1.0.0", TagUrl: ts.URL, DownloadPath: ""}
 
 		status := Update(config)
 
@@ -129,7 +129,7 @@ func TestDownloadScript(t *testing.T) {
 			}
 		}))
 		defer ts.Close()
-		config := &model.UpdateConfig{LatestVersion: "v1.1.1", DownloadPath: tempDir, BinaryBaseUrl: ts.URL}
+		config := &model.Config{LatestVersion: "v1.1.1", DownloadPath: tempDir, BinaryBaseUrl: ts.URL}
 
 		status := downloadScript(config)
 
@@ -140,7 +140,7 @@ func TestDownloadScript(t *testing.T) {
 	})
 
 	t.Run("returns 1 when error at creating file", func(t *testing.T) {
-		config := &model.UpdateConfig{DownloadPath: getProtectedPath(t)}
+		config := &model.Config{DownloadPath: getProtectedPath(t)}
 
 		status := downloadScript(config)
 
@@ -149,7 +149,7 @@ func TestDownloadScript(t *testing.T) {
 
 	t.Run("return 2 when http protocol error", func(t *testing.T) {
 		tempDir := t.TempDir()
-		config := &model.UpdateConfig{DownloadPath: tempDir, BinaryBaseUrl: "/xxx"}
+		config := &model.Config{DownloadPath: tempDir, BinaryBaseUrl: "/xxx"}
 
 		status := downloadScript(config)
 
@@ -162,7 +162,7 @@ func TestDownloadScript(t *testing.T) {
 			w.WriteHeader(500)
 		}))
 		defer ts.Close()
-		config := &model.UpdateConfig{DownloadPath: tempDir, BinaryBaseUrl: ts.URL}
+		config := &model.Config{DownloadPath: tempDir, BinaryBaseUrl: ts.URL}
 
 		status := downloadScript(config)
 

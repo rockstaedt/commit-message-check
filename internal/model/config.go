@@ -1,6 +1,6 @@
 package model
 
-type UpdateConfig struct {
+type Config struct {
 	Version       string
 	LatestVersion string
 	TagUrl        string
