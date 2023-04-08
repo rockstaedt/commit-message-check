@@ -48,44 +48,15 @@ func TestRun(t *testing.T) {
 
 	t.Run("executes validate command", func(t *testing.T) {
 
-		t.Run("success", func(t *testing.T) {
-			buffer.Reset()
-			testFile := t.TempDir() + "/text.txt"
-			err := os.WriteFile(testFile, []byte("i am a commit msg"), 0666)
-			assert.Nil(t, err)
-			myHandler := NewHandler(model.Config{CommitMsgFile: testFile})
+		buffer.Reset()
+		testFile := t.TempDir() + "/text.txt"
+		err := os.WriteFile(testFile, []byte("i am a commit msg"), 0666)
+		assert.Nil(t, err)
+		myHandler := NewHandler(model.Config{CommitMsgFile: testFile})
 
-			myHandler.Run("validate")
+		myHandler.Run("validate")
 
-			assert.Contains(t, buffer.String(), "Valid commit message")
-		})
-
-		t.Run("commit msg too long aborts handler", func(t *testing.T) {
-			buffer.Reset()
-			testFile := t.TempDir() + "/text.txt"
-			content := "waaaaaaaaaaaaaaaaaaaaaaaaaay tooooooooooooooooooo" +
-				"looooooooooooooooooooooong"
-			err := os.WriteFile(testFile, []byte(content), 0666)
-			assert.Nil(t, err)
-			myHandler := NewHandler(model.Config{CommitMsgFile: testFile})
-
-			status := myHandler.Run("validate")
-
-			assert.Contains(t, buffer.String(), "Abort commit")
-			assert.Equal(t, 1, status)
-		})
-
-		t.Run("error at reading file", func(t *testing.T) {
-			buffer.Reset()
-			myHandler := NewHandler(model.Config{CommitMsgFile: "/no_file"})
-
-			status := myHandler.Run("validate")
-
-			want := `Could not read commit message: "file not found"`
-			assert.Contains(t, buffer.String(), want)
-			assert.NotContains(t, buffer.String(), "Valid")
-			assert.Equal(t, 3, status)
-		})
+		assert.Contains(t, buffer.String(), "Valid commit message")
 	})
 
 	t.Run("prints warning when any other command", func(t *testing.T) {

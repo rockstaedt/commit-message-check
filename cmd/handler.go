@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"github.com/rockstaedt/txtreader"
 	"log"
 	"rockstaedt/commit-message-check/internal/model"
 )
@@ -25,13 +24,7 @@ func (h *Handler) Run(command string) int {
 	case "update":
 		status = h.update()
 	case "validate":
-		commitLines, err := txtreader.GetLinesFromTextFile(h.Config.CommitMsgFile)
-		if err != nil {
-			log.Printf("Could not read commit message: %q", err.Error())
-			return 3
-		}
-
-		status = Validate(commitLines)
+		status = h.validate()
 	default:
 		log.Println("Unknown subcommand. Please check manual.")
 		return 4

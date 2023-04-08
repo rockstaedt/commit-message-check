@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/rockstaedt/txtreader"
 	"log"
 	"rockstaedt/commit-message-check/internal/model"
 )
@@ -10,8 +11,14 @@ const (
 	hardLimit = 72
 )
 
-func Validate(commitLines []string) int {
+func (h *Handler) validate() int {
 	log.Println("[INFO]\t Validate commit message.")
+
+	commitLines, err := txtreader.GetLinesFromTextFile(h.Config.CommitMsgFile)
+	if err != nil {
+		log.Printf("Could not read commit message: %q", err.Error())
+		return 1
+	}
 
 	cm := model.CreateCommitMessageFrom(commitLines)
 
