@@ -70,3 +70,25 @@ func TestRun(t *testing.T) {
 		assert.Equal(t, 1, status)
 	})
 }
+
+func TestNotify(t *testing.T) {
+
+	t.Run("writes message to write", func(t *testing.T) {
+		t.Skip()
+	})
+
+	t.Run("accepts a category", func(t *testing.T) {
+
+		t.Run("success", func(t *testing.T) {
+			t.Skip()
+		})
+
+		t.Run("error", func(t *testing.T) {
+			t.Skip()
+		})
+	})
+
+	t.Run("handles error at writing", func(t *testing.T) {
+		t.Skip()
+	})
+}
