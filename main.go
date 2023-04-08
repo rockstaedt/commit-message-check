@@ -45,13 +45,13 @@ func main() {
 		os.Exit(2)
 	}
 
-	var commitMsg string
+	var commitMsgFile string
 	if len(os.Args) == 3 {
-		commitMsg = os.Args[2]
+		commitMsgFile = os.Args[2]
 	}
 
 	config := model.Config{
-		CommitMsg:     commitMsg,
+		CommitMsgFile: commitMsgFile,
 		GitPath:       gitPath,
 		Version:       version,
 		TagUrl:        "https://api.github.com/repos/rockstaedt/commit-message-check/releases/latest",

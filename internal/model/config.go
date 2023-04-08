@@ -1,7 +1,7 @@
 package model
 
 type Config struct {
-	CommitMsg     string
+	CommitMsgFile string
 	GitPath       string
 	Version       string
 	LatestVersion string

@@ -25,7 +25,7 @@ func (h *Handler) Run(command string) int {
 	case "update":
 		status = h.update()
 	case "validate":
-		commitLines, err := txtreader.GetLinesFromTextFile(h.Config.CommitMsg)
+		commitLines, err := txtreader.GetLinesFromTextFile(h.Config.CommitMsgFile)
 		if err != nil {
 			log.Printf("Could not read commit message: %q", err.Error())
 			return 3

@@ -53,7 +53,7 @@ func TestRun(t *testing.T) {
 			testFile := t.TempDir() + "/text.txt"
 			err := os.WriteFile(testFile, []byte("i am a commit msg"), 0666)
 			assert.Nil(t, err)
-			myHandler := NewHandler(model.Config{CommitMsg: testFile})
+			myHandler := NewHandler(model.Config{CommitMsgFile: testFile})
 
 			myHandler.Run("validate")
 
@@ -67,7 +67,7 @@ func TestRun(t *testing.T) {
 				"looooooooooooooooooooooong"
 			err := os.WriteFile(testFile, []byte(content), 0666)
 			assert.Nil(t, err)
-			myHandler := NewHandler(model.Config{CommitMsg: testFile})
+			myHandler := NewHandler(model.Config{CommitMsgFile: testFile})
 
 			status := myHandler.Run("validate")
 
@@ -77,7 +77,7 @@ func TestRun(t *testing.T) {
 
 		t.Run("error at reading file", func(t *testing.T) {
 			buffer.Reset()
-			myHandler := NewHandler(model.Config{CommitMsg: "/no_file"})
+			myHandler := NewHandler(model.Config{CommitMsgFile: "/no_file"})
 
 			status := myHandler.Run("validate")
 
