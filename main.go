@@ -51,7 +51,6 @@ func main() {
 	}
 
 	config := model.Config{
-		Command:       os.Args[1],
 		CommitMsg:     commitMsg,
 		GitPath:       gitPath,
 		Version:       version,
@@ -62,5 +61,5 @@ func main() {
 
 	handler := cmd.NewHandler(config)
 
-	os.Exit(handler.Run())
+	os.Exit(handler.Run(os.Args[1]))
 }

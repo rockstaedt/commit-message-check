@@ -14,10 +14,10 @@ func NewHandler(config model.Config) *Handler {
 	return &Handler{Config: config}
 }
 
-func (h *Handler) Run() int {
+func (h *Handler) Run(command string) int {
 
 	var status int
-	switch h.Config.Command {
+	switch command {
 	case "setup":
 		status = h.setup()
 	case "uninstall":
