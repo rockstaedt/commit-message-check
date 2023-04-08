@@ -14,8 +14,8 @@ func NewHandler(config model.Config) *Handler {
 }
 
 func (h *Handler) Run(command string) int {
-
 	var status int
+
 	switch command {
 	case "setup":
 		status = h.setup()
