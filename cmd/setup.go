@@ -5,8 +5,8 @@ import (
 	"rockstaedt/commit-message-check/util"
 )
 
-func Setup(gitPath string) int {
-	err := util.WalkHookDirs(gitPath, util.CreateHook)
+func (h *Handler) setup() int {
+	err := util.WalkHookDirs(h.Config.GitPath, util.CreateHook)
 	if err != nil {
 		log.Println("[ERROR]\t Could not create commit-msg script.")
 		return 1

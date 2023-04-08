@@ -6,6 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"log"
 	"os"
+	"rockstaedt/commit-message-check/internal/model"
 	"testing"
 )
 
@@ -15,28 +16,25 @@ func TestSetup(t *testing.T) {
 
 	t.Run("returns 0 and", func(t *testing.T) {
 
-		createDirs := func() string {
+		fakeHandler := func() *Handler {
 			path := t.TempDir()
 			err := os.Mkdir(fmt.Sprintf("%s/hooks", path), os.ModePerm)
 			assert.Nil(t, err)
 
-			return path
-		}
+			return NewHandler(model.Config{GitPath: path})
+		}()
 
 		t.Run("creates commit-msg script in hook folder", func(t *testing.T) {
-			path := createDirs()
-
-			status := Setup(path)
+			status := fakeHandler.setup()
 
 			assert.Equal(t, 0, status)
-			assert.FileExists(t, fmt.Sprintf("%s/hooks/commit-msg", path))
+			assert.FileExists(t, fmt.Sprintf("%s/hooks/commit-msg", fakeHandler.Config.GitPath))
 		})
 
 		t.Run("logs a success message", func(t *testing.T) {
 			buffer.Reset()
-			path := createDirs()
 
-			_ = Setup(path)
+			_ = fakeHandler.setup()
 
 			assert.Contains(t, buffer.String(), "[SUCCESS]\t commit-message-check successfully installed.")
 		})
@@ -46,8 +44,9 @@ func TestSetup(t *testing.T) {
 		errPath := t.TempDir()
 		err := os.Mkdir(fmt.Sprintf("%s/hooks", errPath), 0000)
 		assert.Nil(t, err)
+		handler := NewHandler(model.Config{GitPath: errPath})
 
-		status := Setup(errPath)
+		status := handler.setup()
 
 		assert.Equal(t, 1, status)
 		assert.Contains(t, buffer.String(), "[ERROR]\t Could not create commit-msg script.")

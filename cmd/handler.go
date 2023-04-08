@@ -19,7 +19,7 @@ func (h *Handler) Run() int {
 	var status int
 	switch h.Config.Command {
 	case "setup":
-		status = Setup(h.Config.GitPath)
+		status = h.setup()
 	case "uninstall":
 		status = Uninstall(h.Config.GitPath)
 	case "update":
