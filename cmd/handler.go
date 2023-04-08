@@ -21,7 +21,7 @@ func (h *Handler) Run() int {
 	case "setup":
 		status = h.setup()
 	case "uninstall":
-		status = Uninstall(h.Config.GitPath)
+		status = h.uninstall()
 	case "update":
 		status = Update(&h.Config)
 	case "validate":

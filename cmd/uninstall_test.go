@@ -6,6 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"log"
 	"os"
+	"rockstaedt/commit-message-check/internal/model"
 	"testing"
 )
 
@@ -13,7 +14,7 @@ func TestUninstall(t *testing.T) {
 	buffer := &bytes.Buffer{}
 	log.SetOutput(buffer)
 
-	createDirs := func() string {
+	createFakeHandlerWithDirs := func() *Handler {
 		path := t.TempDir()
 		err := os.Mkdir(fmt.Sprintf("%s/hooks", path), os.ModePerm)
 		assert.Nil(t, err)
@@ -24,16 +25,17 @@ func TestUninstall(t *testing.T) {
 		_, err = os.Create(fmt.Sprintf("%s/xyz/commit-msg", path))
 		assert.Nil(t, err)
 
-		return path
+		return NewHandler(model.Config{GitPath: path})
 	}
 
 	t.Run("returns 0 and", func(t *testing.T) {
 
 		t.Run("removes all occurrences of commit-msg", func(t *testing.T) {
-			path := createDirs()
+			handler := createFakeHandlerWithDirs()
 
-			status := Uninstall(path)
+			status := handler.uninstall()
 
+			path := handler.Config.GitPath
 			assert.Equal(t, 0, status)
 			assert.NoFileExists(t, fmt.Sprintf("%s/hooks/commit-msg", path))
 			assert.FileExists(t, fmt.Sprintf("%s/xyz/commit-msg", path))
@@ -41,9 +43,9 @@ func TestUninstall(t *testing.T) {
 
 		t.Run("logs a success message", func(t *testing.T) {
 			buffer.Reset()
-			path := createDirs()
+			handler := createFakeHandlerWithDirs()
 
-			_ = Uninstall(path)
+			_ = handler.uninstall()
 
 			assert.Contains(t, buffer.String(), "[SUCCESS]\t commit-message-check successfully uninstalled.")
 		})
@@ -54,8 +56,9 @@ func TestUninstall(t *testing.T) {
 		errPath := t.TempDir()
 		err := os.Mkdir(fmt.Sprintf("%s/hooks", errPath), 0000)
 		assert.Nil(t, err)
+		handler := NewHandler(model.Config{GitPath: errPath})
 
-		status := Uninstall(errPath)
+		status := handler.uninstall()
 
 		assert.Equal(t, 1, status)
 		assert.Contains(t, buffer.String(), "[ERROR]\t Could not delete commit-msg hook.")
