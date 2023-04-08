@@ -67,6 +67,6 @@ func TestRun(t *testing.T) {
 
 		want := "Unknown subcommand. Please check manual."
 		assert.Contains(t, buffer.String(), want)
-		assert.Equal(t, 4, status)
+		assert.Equal(t, 1, status)
 	})
 }

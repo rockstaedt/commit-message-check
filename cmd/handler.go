@@ -27,7 +27,7 @@ func (h *Handler) Run(command string) int {
 		status = h.validate()
 	default:
 		log.Println("Unknown subcommand. Please check manual.")
-		return 4
+		return 1
 	}
 
 	return status
