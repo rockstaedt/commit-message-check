@@ -15,19 +15,19 @@ type responseData struct {
 	TagName string `json:"tag_name"`
 }
 
-func Update(config *model.Config) int {
-	config.LatestVersion = getLatestTag(config.TagUrl)
-	if config.LatestVersion == "" {
+func (h *Handler) update() int {
+	h.Config.LatestVersion = getLatestTag(h.Config.TagUrl)
+	if h.Config.LatestVersion == "" {
 		log.Println("Error at retrieving latest version.")
 		return 1
 	}
 
-	if config.Version == config.LatestVersion {
+	if h.Config.Version == h.Config.LatestVersion {
 		log.Println("Current version is latest version.")
 		return 0
 	}
 
-	return downloadScript(config)
+	return downloadScript(&h.Config)
 }
 
 func getLatestTag(url string) string {

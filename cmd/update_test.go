@@ -23,9 +23,9 @@ func TestUpdate(t *testing.T) {
 			buffer.Reset()
 			ts := httptest.NewServer(getHandlerFor(`{"tag_name":"v1.0.0"}`))
 			defer ts.Close()
-			config := &model.Config{Version: "v1.0.0", TagUrl: ts.URL}
+			handler := NewHandler(model.Config{Version: "v1.0.0", TagUrl: ts.URL})
 
-			status := Update(config)
+			status := handler.update()
 
 			assert.Equal(t, 0, status)
 			assert.Contains(t, buffer.String(), "Current version is latest version.")
@@ -35,9 +35,9 @@ func TestUpdate(t *testing.T) {
 			ts := httptest.NewServer(getHandlerFor(`{"tag_name":"v1.1.0"}`))
 			defer ts.Close()
 			tempDir := t.TempDir()
-			config := &model.Config{Version: "v1.0.0", TagUrl: ts.URL, DownloadPath: tempDir}
+			handler := NewHandler(model.Config{Version: "v1.0.0", TagUrl: ts.URL, DownloadPath: tempDir})
 
-			_ = Update(config)
+			_ = handler.update()
 
 			assert.FileExists(t, tempDir+"/commit-message-check")
 		})
@@ -47,9 +47,9 @@ func TestUpdate(t *testing.T) {
 		buffer.Reset()
 		ts := httptest.NewServer(getHandlerFor("", 500))
 		defer ts.Close()
-		config := &model.Config{Version: "v1.0.0", TagUrl: ts.URL, DownloadPath: ""}
+		handler := NewHandler(model.Config{Version: "v1.0.0", TagUrl: ts.URL, DownloadPath: ""})
 
-		status := Update(config)
+		status := handler.update()
 
 		assert.Equal(t, 1, status)
 		assert.Contains(t, buffer.String(), "Error at retrieving latest version.")

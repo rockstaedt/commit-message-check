@@ -23,7 +23,7 @@ func (h *Handler) Run() int {
 	case "uninstall":
 		status = h.uninstall()
 	case "update":
-		status = Update(&h.Config)
+		status = h.update()
 	case "validate":
 		commitLines, err := txtreader.GetLinesFromTextFile(h.Config.CommitMsg)
 		if err != nil {
