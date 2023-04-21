@@ -1,12 +1,14 @@
 package cmd
 
 import (
+	"io"
 	"log"
 	"rockstaedt/commit-message-check/internal/model"
 )
 
 type Handler struct {
 	Config model.Config
+	Writer io.Writer
 }
 
 func NewHandler(config model.Config) *Handler {
@@ -31,4 +33,8 @@ func (h *Handler) Run(command string) int {
 	}
 
 	return status
+}
+
+func (h *Handler) notify() {
+	h.Writer.Write([]byte("hallo"))
 }

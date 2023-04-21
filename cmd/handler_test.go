@@ -3,9 +3,11 @@ package cmd
 import (
 	"bytes"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"log"
 	"os"
 	"rockstaedt/commit-message-check/internal/model"
+	"rockstaedt/commit-message-check/testdata/mocks"
 	"testing"
 )
 
@@ -73,8 +75,15 @@ func TestRun(t *testing.T) {
 
 func TestNotify(t *testing.T) {
 
-	t.Run("writes message to write", func(t *testing.T) {
-		t.Skip()
+	t.Run("writes a message to the writer", func(t *testing.T) {
+		handler := NewHandler(model.Config{})
+		fwm := &mocks.FakeWriterMock{}
+		handler.Writer = fwm
+		fwm.On("Write", mock.Anything).Return(1, nil)
+
+		handler.notify()
+
+		fwm.AssertNumberOfCalls(t, "Write", 1)
 	})
 
 	t.Run("accepts a category", func(t *testing.T) {
