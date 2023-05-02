@@ -60,6 +60,7 @@ func main() {
 	}
 
 	handler := cmd.NewHandler(config)
+	handler.Writer = os.Stdout
 
 	os.Exit(handler.Run(os.Args[1]))
 }
