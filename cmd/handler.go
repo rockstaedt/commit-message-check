@@ -35,6 +35,6 @@ func (h *Handler) Run(command string) int {
 	return status
 }
 
-func (h *Handler) notify() {
-	h.Writer.Write([]byte("hallo"))
+func (h *Handler) notify(message string) {
+	h.Writer.Write([]byte(message))
 }

@@ -79,11 +79,12 @@ func TestNotify(t *testing.T) {
 		handler := NewHandler(model.Config{})
 		fwm := &mocks.FakeWriterMock{}
 		handler.Writer = fwm
+		fwm.ResetCalls()
 		fwm.On("Write", mock.Anything).Return(1, nil)
 
-		handler.notify()
+		handler.notify("I am a message")
 
-		fwm.AssertNumberOfCalls(t, "Write", 1)
+		fwm.AssertCalled(t, "Write", []byte("I am a message"))
 	})
 
 	t.Run("accepts a category", func(t *testing.T) {
