@@ -36,5 +36,8 @@ func (h *Handler) Run(command string) int {
 }
 
 func (h *Handler) notify(message string) {
-	h.Writer.Write([]byte(message))
+	_, err := h.Writer.Write([]byte(message))
+	if err != nil {
+		log.Println("Error at writing!")
+	}
 }

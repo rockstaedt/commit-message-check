@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bytes"
+	"errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"log"
@@ -74,11 +75,11 @@ func TestRun(t *testing.T) {
 }
 
 func TestNotify(t *testing.T) {
+	fwm := &mocks.FakeWriterMock{}
+	handler := NewHandler(model.Config{})
+	handler.Writer = fwm
 
 	t.Run("writes a message to the writer", func(t *testing.T) {
-		handler := NewHandler(model.Config{})
-		fwm := &mocks.FakeWriterMock{}
-		handler.Writer = fwm
 		fwm.ResetCalls()
 		fwm.On("Write", mock.Anything).Return(1, nil)
 
@@ -99,6 +100,13 @@ func TestNotify(t *testing.T) {
 	})
 
 	t.Run("handles error at writing", func(t *testing.T) {
-		t.Skip()
+		buffer := &bytes.Buffer{}
+		log.SetOutput(buffer)
+		fwm.ResetCalls()
+		fwm.On("Write", mock.Anything).Return(0, errors.New("error at writing"))
+
+		handler.notify("this causes an error")
+
+		assert.Contains(t, buffer.String(), "Error at writing!")
 	})
 }
