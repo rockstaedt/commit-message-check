@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/TwiN/go-color"
 	"io"
 	"log"
 	"rockstaedt/commit-message-check/internal/model"
@@ -35,7 +36,11 @@ func (h *Handler) Run(command string) int {
 	return status
 }
 
-func (h *Handler) notify(message string) {
+func (h *Handler) notify(message string, txtColor ...string) {
+	if len(txtColor) > 0 && txtColor[0] == "green" {
+		message = color.InGreen(message)
+	}
+
 	_, err := h.Writer.Write([]byte(message))
 	if err != nil {
 		log.Println("Error at writing!")

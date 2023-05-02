@@ -88,13 +88,18 @@ func TestNotify(t *testing.T) {
 		fwm.AssertCalled(t, "Write", []byte("I am a message"))
 	})
 
-	t.Run("accepts a category", func(t *testing.T) {
+	t.Run("colorize text in", func(t *testing.T) {
 
-		t.Run("success", func(t *testing.T) {
-			t.Skip()
+		t.Run("green", func(t *testing.T) {
+			fwm.ResetCalls()
+			fwm.On("Write", mock.Anything).Return(1, nil)
+
+			handler.notify("I am a message", "green")
+
+			fwm.AssertCalled(t, "Write", []byte("\033[32mI am a message\033[0m"))
 		})
 
-		t.Run("error", func(t *testing.T) {
+		t.Run("red", func(t *testing.T) {
 			t.Skip()
 		})
 	})
