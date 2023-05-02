@@ -100,7 +100,12 @@ func TestNotify(t *testing.T) {
 		})
 
 		t.Run("red", func(t *testing.T) {
-			t.Skip()
+			fwm.ResetCalls()
+			fwm.On("Write", mock.Anything).Return(1, nil)
+
+			handler.notify("I am a message", "red")
+
+			fwm.AssertCalled(t, "Write", []byte("\033[31mI am a message\033[0m"))
 		})
 	})
 
