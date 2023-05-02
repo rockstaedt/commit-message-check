@@ -3,6 +3,7 @@ package cmd
 import (
 	"bytes"
 	"errors"
+	"github.com/TwiN/go-color"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"log"
@@ -19,6 +20,7 @@ func TestRun(t *testing.T) {
 	t.Run("executes uninstall command", func(t *testing.T) {
 		buffer.Reset()
 		myHandler := NewHandler(model.Config{GitPath: "/"})
+		myHandler.Writer = buffer
 
 		status := myHandler.Run("uninstall")
 
@@ -32,6 +34,7 @@ func TestRun(t *testing.T) {
 		err := os.Mkdir(protectedPath, 0000)
 		assert.Nil(t, err)
 		myHandler := NewHandler(model.Config{GitPath: protectedPath})
+		myHandler.Writer = buffer
 
 		status := myHandler.Run("setup")
 
@@ -96,7 +99,7 @@ func TestNotify(t *testing.T) {
 
 			handler.notify("I am a message", "green")
 
-			fwm.AssertCalled(t, "Write", []byte("\033[32mI am a message\033[0m\n"))
+			fwm.AssertCalled(t, "Write", []byte(color.Green+"I am a message"+color.Reset+"\n"))
 		})
 
 		t.Run("red", func(t *testing.T) {
@@ -105,7 +108,7 @@ func TestNotify(t *testing.T) {
 
 			handler.notify("I am a message", "red")
 
-			fwm.AssertCalled(t, "Write", []byte("\033[31mI am a message\033[0m\n"))
+			fwm.AssertCalled(t, "Write", []byte(color.Red+"I am a message"+color.Reset+"\n"))
 		})
 	})
 

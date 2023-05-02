@@ -3,8 +3,8 @@ package cmd
 import (
 	"bytes"
 	"fmt"
+	"github.com/TwiN/go-color"
 	"github.com/stretchr/testify/assert"
-	"log"
 	"os"
 	"rockstaedt/commit-message-check/internal/model"
 	"testing"
@@ -12,7 +12,6 @@ import (
 
 func TestSetup(t *testing.T) {
 	buffer := &bytes.Buffer{}
-	log.SetOutput(buffer)
 
 	t.Run("returns 0 and", func(t *testing.T) {
 
@@ -21,7 +20,10 @@ func TestSetup(t *testing.T) {
 			err := os.Mkdir(fmt.Sprintf("%s/hooks", path), os.ModePerm)
 			assert.Nil(t, err)
 
-			return NewHandler(model.Config{GitPath: path})
+			handler := NewHandler(model.Config{GitPath: path})
+			handler.Writer = buffer
+
+			return handler
 		}()
 
 		t.Run("creates commit-msg script in hook folder", func(t *testing.T) {
@@ -36,19 +38,21 @@ func TestSetup(t *testing.T) {
 
 			_ = fakeHandler.setup()
 
-			assert.Contains(t, buffer.String(), "[SUCCESS]\t commit-message-check successfully installed.")
+			assert.Contains(t, buffer.String(), color.Green+"commit-message-check successfully installed."+color.Reset)
 		})
 	})
 
 	t.Run("returns 1 when error at walking hooks and logs it", func(t *testing.T) {
+		buffer.Reset()
 		errPath := t.TempDir()
 		err := os.Mkdir(fmt.Sprintf("%s/hooks", errPath), 0000)
 		assert.Nil(t, err)
 		handler := NewHandler(model.Config{GitPath: errPath})
+		handler.Writer = buffer
 
 		status := handler.setup()
 
 		assert.Equal(t, 1, status)
-		assert.Contains(t, buffer.String(), "[ERROR]\t Could not create commit-msg script.")
+		assert.Contains(t, buffer.String(), color.Red+"Could not create commit-msg script."+color.Reset)
 	})
 }
