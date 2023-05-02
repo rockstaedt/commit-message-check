@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
+	"github.com/TwiN/go-color"
 	"os"
 	"rockstaedt/commit-message-check/cmd"
 	"rockstaedt/commit-message-check/internal/model"
@@ -28,21 +28,21 @@ func main() {
 	}
 
 	if len(os.Args) == 1 {
-		fmt.Println("No subcommands given. Please check manual.")
+		fmt.Println(color.InRed("No subcommands given. Please check manual."))
 		os.Exit(1)
 	}
 
 	cwd, err := os.Getwd()
 	if err != nil {
-		log.Printf("[ERROR]\t Could not determine working directory: %q", err.Error())
+		fmt.Println(color.InRed("Could not determine working directory: ") + err.Error())
 		os.Exit(1)
 	}
 
 	gitPath := fmt.Sprintf("%s/.git", cwd)
 	_, err = os.Stat(gitPath)
 	if err != nil {
-		log.Println("[ERROR]\t No git repository could be found.")
-		os.Exit(2)
+		fmt.Println(color.InRed("No git repository could be found."))
+		os.Exit(1)
 	}
 
 	var commitMsgFile string
