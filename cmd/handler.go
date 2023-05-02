@@ -45,7 +45,7 @@ func (h *Handler) notify(message string, txtColor ...string) {
 		message = color.InRed(message)
 	}
 
-	_, err := h.Writer.Write([]byte(message))
+	_, err := h.Writer.Write([]byte(message + "\n"))
 	if err != nil {
 		log.Println("Error at writing!")
 	}

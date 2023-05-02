@@ -85,7 +85,7 @@ func TestNotify(t *testing.T) {
 
 		handler.notify("I am a message")
 
-		fwm.AssertCalled(t, "Write", []byte("I am a message"))
+		fwm.AssertCalled(t, "Write", []byte("I am a message\n"))
 	})
 
 	t.Run("colorize text in", func(t *testing.T) {
@@ -96,7 +96,7 @@ func TestNotify(t *testing.T) {
 
 			handler.notify("I am a message", "green")
 
-			fwm.AssertCalled(t, "Write", []byte("\033[32mI am a message\033[0m"))
+			fwm.AssertCalled(t, "Write", []byte("\033[32mI am a message\033[0m\n"))
 		})
 
 		t.Run("red", func(t *testing.T) {
@@ -105,7 +105,7 @@ func TestNotify(t *testing.T) {
 
 			handler.notify("I am a message", "red")
 
-			fwm.AssertCalled(t, "Write", []byte("\033[31mI am a message\033[0m"))
+			fwm.AssertCalled(t, "Write", []byte("\033[31mI am a message\033[0m\n"))
 		})
 	})
 
