@@ -3,8 +3,8 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/TwiN/go-color"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"rockstaedt/commit-message-check/internal/model"
@@ -27,7 +27,14 @@ func (h *Handler) update() int {
 		return 0
 	}
 
-	return downloadScript(&h.Config)
+	statusMsg := downloadScript(&h.Config)
+	if statusMsg == "" {
+		return 1
+	}
+
+	h.notify(color.Green + statusMsg)
+
+	return 0
 }
 
 func getLatestTag(url string) string {
@@ -49,29 +56,24 @@ func getLatestTag(url string) string {
 	return data.TagName
 }
 
-func downloadScript(config *model.Config) int {
+func downloadScript(config *model.Config) string {
 	file, err := os.Create(config.DownloadPath + "/commit-message-check")
 	if err != nil {
-		return 1
+		return ""
 	}
 
 	res, err := http.Get(getBinaryUrl(config))
 	if err != nil {
-		return 2
+		return ""
 	}
 
 	if res.StatusCode != 200 {
-		return 3
+		return ""
 	}
 
 	_, _ = io.Copy(file, res.Body)
 
-	log.Printf(
-		"[SUCCESS]\t Updated commit-message-check successfully to %s",
-		config.LatestVersion,
-	)
-
-	return 0
+	return "Updated commit-message-check successfully to " + config.LatestVersion
 }
 
 func getBinaryUrl(config *model.Config) string {

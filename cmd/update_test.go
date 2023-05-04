@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/TwiN/go-color"
 	"github.com/stretchr/testify/assert"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -121,9 +120,7 @@ func TestDownloadScript(t *testing.T) {
 		return protectedPath
 	}
 
-	t.Run("returns 0 and writes downloaded binary content to file", func(t *testing.T) {
-		buffer := &bytes.Buffer{}
-		log.SetOutput(buffer)
+	t.Run("returns success message and writes downloaded binary content to file", func(t *testing.T) {
 		tempDir := t.TempDir()
 		err := os.WriteFile(tempDir+"/dummy", []byte("i am a go binary"), os.ModePerm)
 		assert.Nil(t, err)
@@ -136,44 +133,45 @@ func TestDownloadScript(t *testing.T) {
 		defer ts.Close()
 		config := &model.Config{LatestVersion: "v1.1.1", DownloadPath: tempDir, BinaryBaseUrl: ts.URL}
 
-		status := downloadScript(config)
+		msg := downloadScript(config)
 
-		assert.Equal(t, 0, status)
 		contentBytes, err := os.ReadFile(tempDir + "/commit-message-check")
 		assert.Nil(t, err)
 		assert.Contains(t, string(contentBytes), "i am a go binary")
-		wantedUpdateMsg := "[SUCCESS]\t Updated commit-message-check " +
-			"successfully to v1.1.1"
-		assert.Contains(t, buffer.String(), wantedUpdateMsg)
+		wantedUpdateMsg := "Updated commit-message-check successfully to v1.1.1"
+		assert.Contains(t, msg, wantedUpdateMsg)
 	})
 
-	t.Run("returns 1 when error at creating file", func(t *testing.T) {
-		config := &model.Config{DownloadPath: getProtectedPath(t)}
+	t.Run("returns empty string when", func(t *testing.T) {
 
-		status := downloadScript(config)
+		t.Run("error at creating file", func(t *testing.T) {
+			config := &model.Config{DownloadPath: getProtectedPath(t)}
 
-		assert.Equal(t, 1, status)
-	})
+			msg := downloadScript(config)
 
-	t.Run("return 2 when http protocol error", func(t *testing.T) {
-		tempDir := t.TempDir()
-		config := &model.Config{DownloadPath: tempDir, BinaryBaseUrl: "/xxx"}
+			assert.Equal(t, "", msg)
+		})
 
-		status := downloadScript(config)
+		t.Run("http protocol error", func(t *testing.T) {
+			tempDir := t.TempDir()
+			config := &model.Config{DownloadPath: tempDir, BinaryBaseUrl: "/xxx"}
 
-		assert.Equal(t, 2, status)
-	})
+			msg := downloadScript(config)
 
-	t.Run("return 3 when request not successfully", func(t *testing.T) {
-		tempDir := t.TempDir()
-		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-			w.WriteHeader(500)
-		}))
-		defer ts.Close()
-		config := &model.Config{DownloadPath: tempDir, BinaryBaseUrl: ts.URL}
+			assert.Equal(t, "", msg)
+		})
 
-		status := downloadScript(config)
+		t.Run("request not successfully", func(t *testing.T) {
+			tempDir := t.TempDir()
+			ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+				w.WriteHeader(500)
+			}))
+			defer ts.Close()
+			config := &model.Config{DownloadPath: tempDir, BinaryBaseUrl: ts.URL}
 
-		assert.Equal(t, 3, status)
+			msg := downloadScript(config)
+
+			assert.Equal(t, "", msg)
+		})
 	})
 }
