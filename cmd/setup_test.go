@@ -38,7 +38,7 @@ func TestSetup(t *testing.T) {
 
 			_ = fakeHandler.setup()
 
-			assert.Contains(t, buffer.String(), color.Green+"commit-message-check successfully installed."+color.Reset)
+			assert.Contains(t, buffer.String(), color.Green+"commit-message-check successfully installed.")
 		})
 	})
 
@@ -53,6 +53,6 @@ func TestSetup(t *testing.T) {
 		status := handler.setup()
 
 		assert.Equal(t, 1, status)
-		assert.Contains(t, buffer.String(), color.Red+"Could not create commit-msg script."+color.Reset)
+		assert.Contains(t, buffer.String(), color.Red+"Could not create commit-msg script.")
 	})
 }
