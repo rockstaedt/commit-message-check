@@ -45,6 +45,7 @@ func TestRun(t *testing.T) {
 	t.Run("executes update command", func(t *testing.T) {
 		buffer.Reset()
 		myHandler := NewHandler(model.Config{})
+		myHandler.Writer = buffer
 
 		status := myHandler.Run("update")
 

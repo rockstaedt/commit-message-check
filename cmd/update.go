@@ -18,12 +18,12 @@ type responseData struct {
 func (h *Handler) update() int {
 	h.Config.LatestVersion = getLatestTag(h.Config.TagUrl)
 	if h.Config.LatestVersion == "" {
-		log.Println("Error at retrieving latest version.")
+		h.notify("Error at retrieving latest version.", "red")
 		return 1
 	}
 
 	if h.Config.Version == h.Config.LatestVersion {
-		log.Println("Current version is latest version.")
+		h.notify("Current version is latest version.")
 		return 0
 	}
 

@@ -3,6 +3,7 @@ package cmd
 import (
 	"bytes"
 	"fmt"
+	"github.com/TwiN/go-color"
 	"github.com/stretchr/testify/assert"
 	"log"
 	"net/http"
@@ -15,7 +16,6 @@ import (
 
 func TestUpdate(t *testing.T) {
 	buffer := &bytes.Buffer{}
-	log.SetOutput(buffer)
 
 	t.Run("returns 0 and", func(t *testing.T) {
 
@@ -24,6 +24,7 @@ func TestUpdate(t *testing.T) {
 			ts := httptest.NewServer(getHandlerFor(`{"tag_name":"v1.0.0"}`))
 			defer ts.Close()
 			handler := NewHandler(model.Config{Version: "v1.0.0", TagUrl: ts.URL})
+			handler.Writer = buffer
 
 			status := handler.update()
 
@@ -36,6 +37,7 @@ func TestUpdate(t *testing.T) {
 			defer ts.Close()
 			tempDir := t.TempDir()
 			handler := NewHandler(model.Config{Version: "v1.0.0", TagUrl: ts.URL, DownloadPath: tempDir})
+			handler.Writer = buffer
 
 			_ = handler.update()
 
@@ -48,11 +50,12 @@ func TestUpdate(t *testing.T) {
 		ts := httptest.NewServer(getHandlerFor("", 500))
 		defer ts.Close()
 		handler := NewHandler(model.Config{Version: "v1.0.0", TagUrl: ts.URL, DownloadPath: ""})
+		handler.Writer = buffer
 
 		status := handler.update()
 
 		assert.Equal(t, 1, status)
-		assert.Contains(t, buffer.String(), "Error at retrieving latest version.")
+		assert.Contains(t, buffer.String(), color.Red+"Error at retrieving latest version.")
 	})
 }
 
