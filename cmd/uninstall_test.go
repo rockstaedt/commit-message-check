@@ -3,8 +3,8 @@ package cmd
 import (
 	"bytes"
 	"fmt"
+	"github.com/TwiN/go-color"
 	"github.com/stretchr/testify/assert"
-	"log"
 	"os"
 	"rockstaedt/commit-message-check/internal/model"
 	"testing"
@@ -12,7 +12,6 @@ import (
 
 func TestUninstall(t *testing.T) {
 	buffer := &bytes.Buffer{}
-	log.SetOutput(buffer)
 
 	createFakeHandlerWithDirs := func() *Handler {
 		path := t.TempDir()
@@ -25,7 +24,10 @@ func TestUninstall(t *testing.T) {
 		_, err = os.Create(fmt.Sprintf("%s/xyz/commit-msg", path))
 		assert.Nil(t, err)
 
-		return NewHandler(model.Config{GitPath: path})
+		handler := NewHandler(model.Config{GitPath: path})
+		handler.Writer = buffer
+
+		return handler
 	}
 
 	t.Run("returns 0 and", func(t *testing.T) {
@@ -47,7 +49,7 @@ func TestUninstall(t *testing.T) {
 
 			_ = handler.uninstall()
 
-			assert.Contains(t, buffer.String(), "[SUCCESS]\t commit-message-check successfully uninstalled.")
+			assert.Contains(t, buffer.String(), color.Green+"commit-message-check successfully uninstalled.")
 		})
 	})
 
@@ -57,10 +59,11 @@ func TestUninstall(t *testing.T) {
 		err := os.Mkdir(fmt.Sprintf("%s/hooks", errPath), 0000)
 		assert.Nil(t, err)
 		handler := NewHandler(model.Config{GitPath: errPath})
+		handler.Writer = buffer
 
 		status := handler.uninstall()
 
 		assert.Equal(t, 1, status)
-		assert.Contains(t, buffer.String(), "[ERROR]\t Could not delete commit-msg hook.")
+		assert.Contains(t, buffer.String(), color.Red+"Could not delete commit-msg hook.")
 	})
 }
