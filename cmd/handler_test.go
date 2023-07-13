@@ -111,6 +111,15 @@ func TestNotify(t *testing.T) {
 
 			fwm.AssertCalled(t, "Write", []byte(color.Red+"I am a message"+color.Reset+"\n"))
 		})
+
+		t.Run("yellow", func(t *testing.T) {
+			fwm.ResetCalls()
+			fwm.On("Write", mock.Anything).Return(1, nil)
+
+			handler.notify("I am", "yellow")
+
+			fwm.AssertCalled(t, "Write", []byte(color.Yellow+"I am"+color.Reset+"\n"))
+		})
 	})
 
 	t.Run("handles error at writing", func(t *testing.T) {
