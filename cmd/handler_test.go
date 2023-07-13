@@ -63,7 +63,7 @@ func TestRun(t *testing.T) {
 
 		myHandler.Run("validate")
 
-		assert.Contains(t, buffer.String(), "Valid commit message")
+		assert.Equal(t, 0, buffer.Len())
 	})
 
 	t.Run("prints warning when any other command", func(t *testing.T) {

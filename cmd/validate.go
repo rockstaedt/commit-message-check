@@ -1,8 +1,8 @@
 package cmd
 
 import (
+	"fmt"
 	"github.com/rockstaedt/txtreader"
-	"log"
 	"rockstaedt/commit-message-check/internal/model"
 )
 
@@ -12,11 +12,9 @@ const (
 )
 
 func (h *Handler) validate() int {
-	log.Println("[INFO]\t Validate commit message.")
-
 	commitLines, err := txtreader.GetLinesFromTextFile(h.Config.CommitMsgFile)
 	if err != nil {
-		log.Printf("Could not read commit message: %q", err.Error())
+		h.notify(fmt.Sprintf("Could not read commit message: %q", err.Error()), "red")
 		return 1
 	}
 
@@ -24,16 +22,16 @@ func (h *Handler) validate() int {
 
 	numOfExceedingChars := cm.ValidateSubject()
 	if numOfExceedingChars == 0 {
-		log.Println("[SUCCESS]\t Valid commit message.")
 		return 0
 	}
 
 	if numOfExceedingChars > (hardLimit - softLimit) {
-		log.Println("[ERROR]\t Abort commit. Subject line too long. Please fix.")
+		h.notify("Abort commit. Subject line too long. Please fix.", "red")
 		return 1
 	}
 
-	log.Printf("[WARN]\t Your subject exceeds the soft limit of 50 chars by %d chars.", numOfExceedingChars)
+	message := fmt.Sprintf("Your subject exceeds the soft limit of 50 chars by %d chars.", numOfExceedingChars)
+	h.notify(message, "yellow")
 
 	return 0
 }
