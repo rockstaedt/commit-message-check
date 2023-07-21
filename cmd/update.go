@@ -29,6 +29,7 @@ func (h *Handler) update() int {
 
 	statusMsg := downloadScript(&h.Config)
 	if statusMsg == "" {
+		h.notify("Error while downloading binary.", "red")
 		return 1
 	}
 

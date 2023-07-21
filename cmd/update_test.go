@@ -32,29 +32,63 @@ func TestUpdate(t *testing.T) {
 		})
 
 		t.Run("downloads install script if newer version available", func(t *testing.T) {
-			ts := httptest.NewServer(getHandlerFor(`{"tag_name":"v1.1.0"}`))
-			defer ts.Close()
+			buffer.Reset()
+			tsTag := httptest.NewServer(getHandlerFor(`{"tag_name":"v1.1.0"}`))
+			defer tsTag.Close()
+			tsBinary := httptest.NewServer(getHandlerFor("i am a binary"))
+			defer tsBinary.Close()
 			tempDir := t.TempDir()
-			handler := NewHandler(model.Config{Version: "v1.0.0", TagUrl: ts.URL, DownloadPath: tempDir})
+			handler := NewHandler(model.Config{
+				Version:       "v1.0.0",
+				BinaryBaseUrl: tsBinary.URL,
+				TagUrl:        tsTag.URL,
+				DownloadPath:  tempDir,
+			})
 			handler.Writer = buffer
 
-			_ = handler.update()
+			status := handler.update()
 
 			assert.FileExists(t, tempDir+"/commit-message-check")
+			assert.Equal(t, 0, status)
+			assert.Contains(t, buffer.String(), color.Green+"Updated commit-message-check")
 		})
 	})
 
 	t.Run("returns 1 and message when error at request", func(t *testing.T) {
-		buffer.Reset()
-		ts := httptest.NewServer(getHandlerFor("", 500))
-		defer ts.Close()
-		handler := NewHandler(model.Config{Version: "v1.0.0", TagUrl: ts.URL, DownloadPath: ""})
-		handler.Writer = buffer
 
-		status := handler.update()
+		t.Run("for tag", func(t *testing.T) {
+			buffer.Reset()
+			ts := httptest.NewServer(getHandlerFor("", 500))
+			defer ts.Close()
+			handler := NewHandler(model.Config{Version: "v1.0.0", TagUrl: ts.URL, DownloadPath: ""})
+			handler.Writer = buffer
 
-		assert.Equal(t, 1, status)
-		assert.Contains(t, buffer.String(), color.Red+"Error at retrieving latest version.")
+			status := handler.update()
+
+			assert.Equal(t, 1, status)
+			assert.Contains(t, buffer.String(), color.Red+"Error at retrieving latest version.")
+		})
+
+		t.Run("for binary", func(t *testing.T) {
+			buffer.Reset()
+			tsTag := httptest.NewServer(getHandlerFor(`{"tag_name":"v1.1.0"}`))
+			defer tsTag.Close()
+			tsBinary := httptest.NewServer(getHandlerFor("", 500))
+			defer tsBinary.Close()
+			tempDir := t.TempDir()
+			handler := NewHandler(model.Config{
+				Version:       "v1.0.0",
+				BinaryBaseUrl: tsBinary.URL,
+				TagUrl:        tsTag.URL,
+				DownloadPath:  tempDir,
+			})
+			handler.Writer = buffer
+
+			status := handler.update()
+
+			assert.Equal(t, 1, status)
+			assert.Contains(t, buffer.String(), color.Red+"Error while downloading binary.")
+		})
 	})
 }
 
