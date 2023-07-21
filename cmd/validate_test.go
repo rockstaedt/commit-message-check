@@ -37,6 +37,7 @@ func TestValidate(t *testing.T) {
 
 		assert.Equal(t, status, 0)
 		assert.Contains(t, buffer.String(), color.Yellow+"Your subject exceeds the soft limit of 50 chars by 2 chars.")
+		assert.Contains(t, buffer.String(), "i am two characters more thaaaaaaaaaaaaaaaaaaaaan "+color.Yellow+"50")
 	})
 
 	t.Run("returns 1 when commit message too long", func(t *testing.T) {

@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/TwiN/go-color"
 	"github.com/rockstaedt/txtreader"
 	"rockstaedt/commit-message-check/internal/model"
 )
@@ -32,6 +33,7 @@ func (h *Handler) validate() int {
 
 	message := fmt.Sprintf("Your subject exceeds the soft limit of 50 chars by %d chars.", numOfExceedingChars)
 	h.notify(message, "yellow")
+	h.notify(cm.Subject[:softLimit] + color.InYellow(cm.Subject[softLimit:]))
 
 	return 0
 }
