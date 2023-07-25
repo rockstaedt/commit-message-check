@@ -50,7 +50,7 @@ func TestUpdate(t *testing.T) {
 
 			assert.FileExists(t, tempDir+"/commit-message-check")
 			assert.Equal(t, 0, status)
-			assert.Contains(t, buffer.String(), color.Green+"Updated commit-message-check")
+			assert.Contains(t, buffer.String(), "updated successfully to")
 		})
 	})
 
@@ -172,7 +172,7 @@ func TestDownloadScript(t *testing.T) {
 		contentBytes, err := os.ReadFile(tempDir + "/commit-message-check")
 		assert.Nil(t, err)
 		assert.Contains(t, string(contentBytes), "i am a go binary")
-		wantedUpdateMsg := "Updated commit-message-check successfully to v1.1.1"
+		wantedUpdateMsg := "commit-message-check updated successfully to v1.1.1"
 		assert.Contains(t, msg, wantedUpdateMsg)
 	})
 

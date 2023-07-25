@@ -74,7 +74,7 @@ func downloadScript(config *model.Config) string {
 
 	_, _ = io.Copy(file, res.Body)
 
-	return "Updated commit-message-check successfully to " + config.LatestVersion
+	return "commit-message-check updated successfully to " + config.LatestVersion
 }
 
 func getBinaryUrl(config *model.Config) string {
