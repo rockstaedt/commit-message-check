@@ -1,6 +1,8 @@
 package model
 
-type UpdateConfig struct {
+type Config struct {
+	CommitMsgFile string
+	GitPath       string
 	Version       string
 	LatestVersion string
 	TagUrl        string

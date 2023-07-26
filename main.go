@@ -3,8 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/rockstaedt/txtreader"
-	"log"
+	"github.com/TwiN/go-color"
 	"os"
 	"rockstaedt/commit-message-check/cmd"
 	"rockstaedt/commit-message-check/internal/model"
@@ -29,56 +28,39 @@ func main() {
 	}
 
 	if len(os.Args) == 1 {
-		fmt.Println("No subcommands given. Please check manual.")
+		fmt.Println(color.InRed("No subcommands given. Please check manual."))
 		os.Exit(1)
 	}
 
 	cwd, err := os.Getwd()
 	if err != nil {
-		log.Printf("[ERROR]\t Could not determine working directory: %q", err.Error())
+		fmt.Println(color.InRed("Could not determine working directory: ") + err.Error())
 		os.Exit(1)
 	}
 
 	gitPath := fmt.Sprintf("%s/.git", cwd)
 	_, err = os.Stat(gitPath)
 	if err != nil {
-		log.Println("[ERROR]\t No git repository could be found.")
-		os.Exit(2)
+		fmt.Println(color.InRed("No git repository could be found."))
+		os.Exit(1)
 	}
 
-	var status int
-	switch os.Args[1] {
-	case "setup":
-		status = cmd.Setup(gitPath)
-	case "uninstall":
-		status = cmd.Uninstall(gitPath)
-	case "update":
-		config := &model.UpdateConfig{
-			Version:       version,
-			TagUrl:        "https://api.github.com/repos/rockstaedt/commit-message-check/releases/latest",
-			BinaryBaseUrl: "https://github.com/rockstaedt/commit-message-check/releases/latest/download/",
-			DownloadPath:  cwd,
-		}
-
-		status = cmd.Update(config)
-
-		if status > 0 {
-			log.Println("[ERROR]\t Could not update commit-message-check.")
-			break
-		}
-		log.Printf("[SUCCESS]\t Updated commit-message-check successfully to %s", config.LatestVersion)
-	case "validate":
-		commitLines, err := txtreader.GetLinesFromTextFile(os.Args[2])
-		if err != nil {
-			log.Printf("[ERROR]\t Could not read commit message lines: %q", err.Error())
-			status = 3
-		}
-
-		status = cmd.Validate(commitLines)
-	default:
-		fmt.Printf("Unknown subcommand %q. Please check manual with -h flag.\n", os.Args[1])
-		status = 4
+	var commitMsgFile string
+	if len(os.Args) == 3 {
+		commitMsgFile = os.Args[2]
 	}
 
-	os.Exit(status)
+	config := model.Config{
+		CommitMsgFile: commitMsgFile,
+		GitPath:       gitPath,
+		Version:       version,
+		TagUrl:        "https://api.github.com/repos/rockstaedt/commit-message-check/releases/latest",
+		BinaryBaseUrl: "https://github.com/rockstaedt/commit-message-check/releases/latest/download/",
+		DownloadPath:  cwd,
+	}
+
+	handler := cmd.NewHandler(config)
+	handler.Writer = os.Stdout
+
+	os.Exit(handler.Run(os.Args[1]))
 }

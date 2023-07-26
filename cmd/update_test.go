@@ -3,8 +3,8 @@ package cmd
 import (
 	"bytes"
 	"fmt"
+	"github.com/TwiN/go-color"
 	"github.com/stretchr/testify/assert"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -15,7 +15,6 @@ import (
 
 func TestUpdate(t *testing.T) {
 	buffer := &bytes.Buffer{}
-	log.SetOutput(buffer)
 
 	t.Run("returns 0 and", func(t *testing.T) {
 
@@ -23,36 +22,73 @@ func TestUpdate(t *testing.T) {
 			buffer.Reset()
 			ts := httptest.NewServer(getHandlerFor(`{"tag_name":"v1.0.0"}`))
 			defer ts.Close()
-			config := &model.UpdateConfig{Version: "v1.0.0", TagUrl: ts.URL}
+			handler := NewHandler(model.Config{Version: "v1.0.0", TagUrl: ts.URL})
+			handler.Writer = buffer
 
-			status := Update(config)
+			status := handler.update()
 
 			assert.Equal(t, 0, status)
 			assert.Contains(t, buffer.String(), "Current version is latest version.")
 		})
 
 		t.Run("downloads install script if newer version available", func(t *testing.T) {
-			ts := httptest.NewServer(getHandlerFor(`{"tag_name":"v1.1.0"}`))
-			defer ts.Close()
+			buffer.Reset()
+			tsTag := httptest.NewServer(getHandlerFor(`{"tag_name":"v1.1.0"}`))
+			defer tsTag.Close()
+			tsBinary := httptest.NewServer(getHandlerFor("i am a binary"))
+			defer tsBinary.Close()
 			tempDir := t.TempDir()
-			config := &model.UpdateConfig{Version: "v1.0.0", TagUrl: ts.URL, DownloadPath: tempDir}
+			handler := NewHandler(model.Config{
+				Version:       "v1.0.0",
+				BinaryBaseUrl: tsBinary.URL,
+				TagUrl:        tsTag.URL,
+				DownloadPath:  tempDir,
+			})
+			handler.Writer = buffer
 
-			_ = Update(config)
+			status := handler.update()
 
 			assert.FileExists(t, tempDir+"/commit-message-check")
+			assert.Equal(t, 0, status)
+			assert.Contains(t, buffer.String(), "updated successfully to")
 		})
 	})
 
 	t.Run("returns 1 and message when error at request", func(t *testing.T) {
-		buffer.Reset()
-		ts := httptest.NewServer(getHandlerFor("", 500))
-		defer ts.Close()
-		config := &model.UpdateConfig{Version: "v1.0.0", TagUrl: ts.URL, DownloadPath: ""}
 
-		status := Update(config)
+		t.Run("for tag", func(t *testing.T) {
+			buffer.Reset()
+			ts := httptest.NewServer(getHandlerFor("", 500))
+			defer ts.Close()
+			handler := NewHandler(model.Config{Version: "v1.0.0", TagUrl: ts.URL, DownloadPath: ""})
+			handler.Writer = buffer
 
-		assert.Equal(t, 1, status)
-		assert.Contains(t, buffer.String(), "Error at retrieving latest version.")
+			status := handler.update()
+
+			assert.Equal(t, 1, status)
+			assert.Contains(t, buffer.String(), color.Red+"Error at retrieving latest version.")
+		})
+
+		t.Run("for binary", func(t *testing.T) {
+			buffer.Reset()
+			tsTag := httptest.NewServer(getHandlerFor(`{"tag_name":"v1.1.0"}`))
+			defer tsTag.Close()
+			tsBinary := httptest.NewServer(getHandlerFor("", 500))
+			defer tsBinary.Close()
+			tempDir := t.TempDir()
+			handler := NewHandler(model.Config{
+				Version:       "v1.0.0",
+				BinaryBaseUrl: tsBinary.URL,
+				TagUrl:        tsTag.URL,
+				DownloadPath:  tempDir,
+			})
+			handler.Writer = buffer
+
+			status := handler.update()
+
+			assert.Equal(t, 1, status)
+			assert.Contains(t, buffer.String(), color.Red+"Error while downloading binary.")
+		})
 	})
 }
 
@@ -118,7 +154,7 @@ func TestDownloadScript(t *testing.T) {
 		return protectedPath
 	}
 
-	t.Run("returns 0 and writes downloaded binary content to file", func(t *testing.T) {
+	t.Run("returns success message and writes downloaded binary content to file", func(t *testing.T) {
 		tempDir := t.TempDir()
 		err := os.WriteFile(tempDir+"/dummy", []byte("i am a go binary"), os.ModePerm)
 		assert.Nil(t, err)
@@ -129,43 +165,47 @@ func TestDownloadScript(t *testing.T) {
 			}
 		}))
 		defer ts.Close()
-		config := &model.UpdateConfig{LatestVersion: "v1.1.1", DownloadPath: tempDir, BinaryBaseUrl: ts.URL}
+		config := &model.Config{LatestVersion: "v1.1.1", DownloadPath: tempDir, BinaryBaseUrl: ts.URL}
 
-		status := downloadScript(config)
+		msg := downloadScript(config)
 
-		assert.Equal(t, 0, status)
 		contentBytes, err := os.ReadFile(tempDir + "/commit-message-check")
 		assert.Nil(t, err)
 		assert.Contains(t, string(contentBytes), "i am a go binary")
+		wantedUpdateMsg := "commit-message-check updated successfully to v1.1.1"
+		assert.Contains(t, msg, wantedUpdateMsg)
 	})
 
-	t.Run("returns 1 when error at creating file", func(t *testing.T) {
-		config := &model.UpdateConfig{DownloadPath: getProtectedPath(t)}
+	t.Run("returns empty string when", func(t *testing.T) {
 
-		status := downloadScript(config)
+		t.Run("error at creating file", func(t *testing.T) {
+			config := &model.Config{DownloadPath: getProtectedPath(t)}
 
-		assert.Equal(t, 1, status)
-	})
+			msg := downloadScript(config)
 
-	t.Run("return 2 when http protocol error", func(t *testing.T) {
-		tempDir := t.TempDir()
-		config := &model.UpdateConfig{DownloadPath: tempDir, BinaryBaseUrl: "/xxx"}
+			assert.Equal(t, "", msg)
+		})
 
-		status := downloadScript(config)
+		t.Run("http protocol error", func(t *testing.T) {
+			tempDir := t.TempDir()
+			config := &model.Config{DownloadPath: tempDir, BinaryBaseUrl: "/xxx"}
 
-		assert.Equal(t, 2, status)
-	})
+			msg := downloadScript(config)
 
-	t.Run("return 3 when request not successfully", func(t *testing.T) {
-		tempDir := t.TempDir()
-		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-			w.WriteHeader(500)
-		}))
-		defer ts.Close()
-		config := &model.UpdateConfig{DownloadPath: tempDir, BinaryBaseUrl: ts.URL}
+			assert.Equal(t, "", msg)
+		})
 
-		status := downloadScript(config)
+		t.Run("request not successfully", func(t *testing.T) {
+			tempDir := t.TempDir()
+			ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+				w.WriteHeader(500)
+			}))
+			defer ts.Close()
+			config := &model.Config{DownloadPath: tempDir, BinaryBaseUrl: ts.URL}
 
-		assert.Equal(t, 3, status)
+			msg := downloadScript(config)
+
+			assert.Equal(t, "", msg)
+		})
 	})
 }

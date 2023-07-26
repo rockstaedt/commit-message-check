@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"log"
 	"os"
 	"rockstaedt/commit-message-check/testdata/mocks"
@@ -155,9 +156,10 @@ func TestWriteContent(t *testing.T) {
 
 	t.Run("logs any error", func(t *testing.T) {
 		log.SetOutput(buffer)
-		errBuffer := mocks.FakeWriter{}
+		fwm := &mocks.FakeWriterMock{}
+		fwm.On("Write", mock.Anything).Return(0, errors.New("error at writing"))
 
-		writeContent(errBuffer, "usr/tmp")
+		writeContent(fwm, "usr/tmp")
 
 		assert.Contains(t, buffer.String(), "[ERROR]\t Could not write commit-msg script: error at writing")
 	})

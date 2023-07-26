@@ -1,10 +1,20 @@
 package mocks
 
-import "errors"
+import (
+	"github.com/stretchr/testify/mock"
+)
 
-type FakeWriter struct {
+type FakeWriterMock struct {
+	mock.Mock
 }
 
-func (fw FakeWriter) Write(p []byte) (int, error) {
-	return 0, errors.New("error at writing")
+func (fwm *FakeWriterMock) ResetCalls() {
+	fwm.Calls = []mock.Call{}
+	fwm.ExpectedCalls = []*mock.Call{}
+}
+
+func (fwm *FakeWriterMock) Write(p []byte) (int, error) {
+	args := fwm.Called(p)
+
+	return 0, args.Error(1)
 }

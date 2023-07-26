@@ -2,43 +2,70 @@ package cmd
 
 import (
 	"bytes"
+	"github.com/TwiN/go-color"
 	"github.com/stretchr/testify/assert"
-	"log"
+	"os"
+	"rockstaedt/commit-message-check/internal/model"
 	"testing"
 )
 
 func TestValidate(t *testing.T) {
 	buffer := &bytes.Buffer{}
-	log.SetOutput(buffer)
 
-	t.Run("returns 0 if valid and logs a success", func(t *testing.T) {
+	t.Run("returns 0 on success", func(t *testing.T) {
 		buffer.Reset()
-		commitLines := []string{"i am shorter than 50 characters"}
+		testFile := t.TempDir() + "/text.txt"
+		err := os.WriteFile(testFile, []byte("i am a short commit msg"), 0666)
+		assert.Nil(t, err)
+		handler := NewHandler(model.Config{CommitMsgFile: testFile})
+		handler.Writer = buffer
 
-		status := Validate(commitLines)
+		handler.Run("validate")
 
-		assert.Equal(t, status, 0)
-		assert.Contains(t, buffer.String(), "[INFO]\t Validate commit message.")
-		assert.Contains(t, buffer.String(), "[SUCCESS]\t Valid commit message")
+		assert.Equal(t, 0, buffer.Len())
 	})
 
-	t.Run("returns 0 if soft limit exceeds and logs a warning", func(t *testing.T) {
+	t.Run("returns 0 when soft limit exceeds and logs a warning", func(t *testing.T) {
 		buffer.Reset()
-		commitLines := []string{"i am two characters more thaaaaaaaaaaaaaaaaaaaaan 50"}
+		testFile := t.TempDir() + "/text.txt"
+		err := os.WriteFile(testFile, []byte("i am two characters more thaaaaaaaaaaaaaaaaaaaaan 50"), 0666)
+		assert.Nil(t, err)
+		handler := NewHandler(model.Config{CommitMsgFile: testFile})
+		handler.Writer = buffer
 
-		status := Validate(commitLines)
+		status := handler.validate()
 
 		assert.Equal(t, status, 0)
-		assert.Contains(t, buffer.String(), "[WARN]\t Your subject exceeds the soft limit of 50 chars by 2 chars.")
+		assert.Contains(t, buffer.String(), color.Yellow+"Your subject exceeds the soft limit of 50 chars by 2 chars.")
+		assert.Contains(t, buffer.String(), "i am two characters more thaaaaaaaaaaaaaaaaaaaaan "+color.Yellow+"50")
 	})
 
-	t.Run("returns 1 if length > 70 and logs an error", func(t *testing.T) {
+	t.Run("returns 1 when commit message too long", func(t *testing.T) {
 		buffer.Reset()
-		commitLines := []string{"i am way toooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo long"}
+		testFile := t.TempDir() + "/text.txt"
+		content := "waaaaaaaaaaaaaaaaaaaaaaaaaay tooooooooooooooooooo" +
+			"looooooooooooooooooooooong"
+		err := os.WriteFile(testFile, []byte(content), 0666)
+		assert.Nil(t, err)
+		handler := NewHandler(model.Config{CommitMsgFile: testFile})
+		handler.Writer = buffer
 
-		status := Validate(commitLines)
+		status := handler.Run("validate")
 
-		assert.Equal(t, status, 1)
-		assert.Contains(t, buffer.String(), "[ERROR]\t Abort commit. Subject line too long. Please fix.")
+		assert.Contains(t, buffer.String(), color.Red+"Abort commit")
+		assert.Equal(t, 1, status)
+	})
+
+	t.Run("returns 1 when error at reading file", func(t *testing.T) {
+		buffer.Reset()
+		handler := NewHandler(model.Config{CommitMsgFile: "/no_file"})
+		handler.Writer = buffer
+
+		status := handler.Run("validate")
+
+		want := `Could not read commit message: "file not found"`
+		assert.Contains(t, buffer.String(), want)
+		assert.NotContains(t, buffer.String(), "Valid commit")
+		assert.Equal(t, 1, status)
 	})
 }
