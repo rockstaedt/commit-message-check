@@ -4,8 +4,10 @@ import (
 	"strings"
 )
 
+type Subject []rune
+
 type CommitMessage struct {
-	Subject     string
+	Subject     Subject
 	Body        []string
 	InvalidBody bool
 }
@@ -19,9 +21,9 @@ func CreateCommitMessageFrom(messageLines []string) *CommitMessage {
 }
 
 func (cm *CommitMessage) ValidateSubject() int {
-	currentSubjectLength := len([]rune(cm.Subject))
+	currentSubjectLength := len(cm.Subject)
 
-	if strings.HasPrefix(cm.Subject, "Merge ") {
+	if strings.HasPrefix(cm.Subject.String(), "Merge ") {
 		return 0
 	}
 
@@ -32,9 +34,13 @@ func (cm *CommitMessage) ValidateSubject() int {
 	return 0
 }
 
+func (s Subject) String() string {
+	return string(s)
+}
+
 func (cm *CommitMessage) addSubject(messageLines []string) {
 	if len(messageLines) >= 1 {
-		cm.Subject = messageLines[0]
+		cm.Subject = []rune(messageLines[0])
 	}
 }
 
