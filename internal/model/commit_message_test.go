@@ -19,7 +19,7 @@ func TestNewCommitMessage(t *testing.T) {
 	t.Run("create new commit message object from File", func(t *testing.T) {
 		cm := CreateCommitMessageFrom(validCommitMsgLines)
 
-		assert.Equal(t, "I am a valid Subject with less than 50 characters", cm.Subject)
+		assert.Equal(t, "I am a valid Subject with less than 50 characters", cm.Subject.String())
 		assert.Len(t, cm.Body, 3)
 		assert.False(t, cm.InvalidBody)
 	})
@@ -28,7 +28,7 @@ func TestNewCommitMessage(t *testing.T) {
 		var emptyCommitMsgLines []string
 		cm := CreateCommitMessageFrom(emptyCommitMsgLines)
 
-		assert.Equal(t, "", cm.Subject)
+		assert.Equal(t, "", cm.Subject.String())
 		assert.Len(t, cm.Body, 0)
 	})
 
@@ -41,7 +41,7 @@ func TestNewCommitMessage(t *testing.T) {
 		cm := CreateCommitMessageFrom(invalidCommitMsgLines)
 
 		t.Run("sets body correct", func(t *testing.T) {
-			assert.Equal(t, "subject line", cm.Subject)
+			assert.Equal(t, "subject line", cm.Subject.String())
 			assert.Len(t, cm.Body, 2)
 		})
 
@@ -62,10 +62,11 @@ func TestNewCommitMessage(t *testing.T) {
 		}{
 			{"more than................72....................................characters", 23},
 			{"more than................50................less than 72 characters", 16},
-			{"#1301 - more than........50..............through ID prefix", 0},
+			{"#1301 - more than........50..............through ID prefix", 8},
 			{"short subject line", 0},
 			{"Merge pull request commits are ignored because they can easily exceed 52 characters", 0},
 			{"Merge branch commits are also ignored..............................................", 0},
+			{"I am a commit containing an umlaut ü.................", 3},
 		}
 
 		for _, tc := range testcases {

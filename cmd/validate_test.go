@@ -28,7 +28,7 @@ func TestValidate(t *testing.T) {
 	t.Run("returns 0 when soft limit exceeds and logs a warning", func(t *testing.T) {
 		buffer.Reset()
 		testFile := t.TempDir() + "/text.txt"
-		err := os.WriteFile(testFile, []byte("i am two characters more thaaaaaaaaaaaaaaaaaaaaan 50"), 0666)
+		err := os.WriteFile(testFile, []byte("i am two characters more thäaaaaaaaaaaaaaaaaaaaan 50"), 0666)
 		assert.Nil(t, err)
 		handler := NewHandler(model.Config{CommitMsgFile: testFile})
 		handler.Writer = buffer
@@ -37,7 +37,7 @@ func TestValidate(t *testing.T) {
 
 		assert.Equal(t, status, 0)
 		assert.Contains(t, buffer.String(), color.Yellow+"Your subject exceeds the soft limit of 50 chars by 2 chars.")
-		assert.Contains(t, buffer.String(), "i am two characters more thaaaaaaaaaaaaaaaaaaaaan "+color.Yellow+"50")
+		assert.Contains(t, buffer.String(), "i am two characters more thäaaaaaaaaaaaaaaaaaaaan "+color.Yellow+"50")
 	})
 
 	t.Run("returns 1 when commit message too long", func(t *testing.T) {
