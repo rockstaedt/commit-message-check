@@ -1,7 +1,6 @@
 package model
 
 import (
-	"regexp"
 	"strings"
 )
 
@@ -26,15 +25,8 @@ func (cm *CommitMessage) ValidateSubject() int {
 		return 0
 	}
 
-	if currentSubjectLength > 72 {
-		return currentSubjectLength - 50
-	}
-
 	if currentSubjectLength > 50 {
-		re := regexp.MustCompile(`^#\d+ -\s*(.*)$`)
-		trimmedSubject := re.ReplaceAllString(cm.Subject, `$1`)
-
-		return len(trimmedSubject) - 50
+		return currentSubjectLength - 50
 	}
 
 	return 0
