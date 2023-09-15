@@ -21,7 +21,7 @@ further [reference](https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks).
 curl -o install.sh  -L https://raw.githubusercontent.com/rockstaedt/commit-message-check/main/install.sh && chmod +x ./install.sh && ./install.sh
 ```
 
-## Usage
+## Usage (Deprecated)
 
 Every time a git commit is made, the corresponding hook is fired. For a commit 
 message that is too long (>50 characters), the commit process is 
