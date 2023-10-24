@@ -51,8 +51,7 @@ func TestValidate(t *testing.T) {
 
 		t.Run("user confirms abort", func(t *testing.T) {
 			buffer.Reset()
-			reader := bytes.NewReader([]byte("y"))
-			handler.Reader = reader
+			handler.Reader = bytes.NewReader([]byte("y"))
 
 			status := handler.Run("validate")
 
@@ -61,8 +60,7 @@ func TestValidate(t *testing.T) {
 		})
 		t.Run("user declines abort", func(t *testing.T) {
 			buffer.Reset()
-			reader := bytes.NewReader([]byte("n"))
-			handler.Reader = reader
+			handler.Reader = bytes.NewReader([]byte("n"))
 
 			status := handler.Run("validate")
 
