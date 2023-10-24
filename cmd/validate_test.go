@@ -49,7 +49,7 @@ func TestValidate(t *testing.T) {
 		handler := NewHandler(model.Config{CommitMsgFile: testFile})
 		handler.Writer = buffer
 
-		t.Run("user confirms abort", func(t *testing.T) {
+		t.Run("user confirms abort returns 1", func(t *testing.T) {
 			buffer.Reset()
 			handler.Reader = bytes.NewReader([]byte("y"))
 
@@ -58,13 +58,24 @@ func TestValidate(t *testing.T) {
 			assert.Contains(t, buffer.String(), color.Red+"Subject line too long. Do you want to abort? (y/n)")
 			assert.Equal(t, 1, status)
 		})
-		t.Run("user declines abort", func(t *testing.T) {
+
+		t.Run("user declines abort returns 0", func(t *testing.T) {
 			buffer.Reset()
 			handler.Reader = bytes.NewReader([]byte("n"))
 
 			status := handler.Run("validate")
 
 			assert.Equal(t, 0, status)
+		})
+
+		t.Run("error at reading user input returns 1", func(t *testing.T) {
+			buffer.Reset()
+			handler.Reader = bytes.NewReader([]byte(""))
+
+			status := handler.Run("validate")
+
+			assert.Equal(t, 1, status)
+			assert.Contains(t, buffer.String(), color.Red+"Could not read user input.")
 		})
 	})
 

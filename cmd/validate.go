@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/TwiN/go-color"
 	"github.com/rockstaedt/txtreader"
-	"log"
 	"rockstaedt/commit-message-check/internal/model"
 )
 
@@ -31,9 +30,9 @@ func (h *Handler) validate() int {
 		h.notify("Subject line too long. Do you want to abort? (y/n)", "red")
 
 		var decision string
-		_, err := fmt.Fscanln(h.Reader, &decision)
-		if err != nil {
-			log.Fatal(err)
+		if _, err := fmt.Fscanln(h.Reader, &decision); err != nil {
+			h.notify("Could not read user input.", "red")
+			return 1
 		}
 
 		if decision == "y" {
