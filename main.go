@@ -61,6 +61,7 @@ func main() {
 
 	handler := cmd.NewHandler(config)
 	handler.Writer = os.Stdout
+	handler.Reader = os.Stdin
 
 	os.Exit(handler.Run(os.Args[1]))
 }

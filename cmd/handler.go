@@ -10,6 +10,7 @@ import (
 type Handler struct {
 	Config model.Config
 	Writer io.Writer
+	Reader io.Reader
 }
 
 func NewHandler(config model.Config) *Handler {

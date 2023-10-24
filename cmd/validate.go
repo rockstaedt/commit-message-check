@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/TwiN/go-color"
 	"github.com/rockstaedt/txtreader"
+	"log"
 	"rockstaedt/commit-message-check/internal/model"
 )
 
@@ -27,8 +28,19 @@ func (h *Handler) validate() int {
 	}
 
 	if numOfExceedingChars > (hardLimit - softLimit) {
-		h.notify("Abort commit. Subject line too long. Please fix.", "red")
-		return 1
+		h.notify("Subject line too long. Do you want to abort? (y/n)", "red")
+
+		var decision string
+		_, err := fmt.Fscanln(h.Reader, &decision)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		if decision == "y" {
+			return 1
+		}
+
+		return 0
 	}
 
 	message := fmt.Sprintf("Your subject exceeds the soft limit of 50 chars by %d chars.", numOfExceedingChars)
