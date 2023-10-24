@@ -136,6 +136,7 @@ func TestWriteContent(t *testing.T) {
 		writeContent(buffer, "usr/tmp")
 
 		assert.Contains(t, buffer.String(), "#!/bin/sh\n\n")
+		assert.Contains(t, buffer.String(), "exec < /dev/tty\n\n")
 	})
 
 	t.Run("executes commit-message-check with root path and quotes path to handle spaces", func(t *testing.T) {
