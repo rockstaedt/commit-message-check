@@ -46,12 +46,12 @@ func TestValidate(t *testing.T) {
 			"looooooooooooooooooooooong"
 		err := os.WriteFile(testFile, []byte(content), 0666)
 		assert.Nil(t, err)
+		handler := NewHandler(model.Config{CommitMsgFile: testFile})
+		handler.Writer = buffer
 
 		t.Run("user confirms abort", func(t *testing.T) {
 			buffer.Reset()
 			reader := bytes.NewReader([]byte("y"))
-			handler := NewHandler(model.Config{CommitMsgFile: testFile})
-			handler.Writer = buffer
 			handler.Reader = reader
 
 			status := handler.Run("validate")
@@ -62,8 +62,6 @@ func TestValidate(t *testing.T) {
 		t.Run("user declines abort", func(t *testing.T) {
 			buffer.Reset()
 			reader := bytes.NewReader([]byte("n"))
-			handler := NewHandler(model.Config{CommitMsgFile: testFile})
-			handler.Writer = buffer
 			handler.Reader = reader
 
 			status := handler.Run("validate")
