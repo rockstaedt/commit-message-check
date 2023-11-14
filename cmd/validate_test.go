@@ -40,8 +40,7 @@ func TestValidate(t *testing.T) {
 		assert.Contains(t, buffer.String(), "i am two characters more thäaaaaaaaaaaaaaaaaaaaan "+color.Yellow+"50")
 	})
 
-	t.Run("returns 1 when commit message too long", func(t *testing.T) {
-		buffer.Reset()
+	t.Run("asks user for abort when commit message too long", func(t *testing.T) {
 		testFile := t.TempDir() + "/text.txt"
 		content := "waaaaaaaaaaaaaaaaaaaaaaaaaay tooooooooooooooooooo" +
 			"looooooooooooooooooooooong"
@@ -50,10 +49,34 @@ func TestValidate(t *testing.T) {
 		handler := NewHandler(model.Config{CommitMsgFile: testFile})
 		handler.Writer = buffer
 
-		status := handler.Run("validate")
+		t.Run("user confirms abort returns 1", func(t *testing.T) {
+			buffer.Reset()
+			handler.Reader = bytes.NewReader([]byte("y"))
 
-		assert.Contains(t, buffer.String(), color.Red+"Abort commit")
-		assert.Equal(t, 1, status)
+			status := handler.Run("validate")
+
+			assert.Contains(t, buffer.String(), color.Red+"Subject line too long. Do you want to abort? (y/n)")
+			assert.Equal(t, 1, status)
+		})
+
+		t.Run("user declines abort returns 0", func(t *testing.T) {
+			buffer.Reset()
+			handler.Reader = bytes.NewReader([]byte("n"))
+
+			status := handler.Run("validate")
+
+			assert.Equal(t, 0, status)
+		})
+
+		t.Run("error at reading user input returns 1", func(t *testing.T) {
+			buffer.Reset()
+			handler.Reader = bytes.NewReader([]byte(""))
+
+			status := handler.Run("validate")
+
+			assert.Equal(t, 1, status)
+			assert.Contains(t, buffer.String(), color.Red+"Could not read user input.")
+		})
 	})
 
 	t.Run("returns 1 when error at reading file", func(t *testing.T) {

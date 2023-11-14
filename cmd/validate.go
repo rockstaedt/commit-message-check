@@ -27,8 +27,19 @@ func (h *Handler) validate() int {
 	}
 
 	if numOfExceedingChars > (hardLimit - softLimit) {
-		h.notify("Abort commit. Subject line too long. Please fix.", "red")
-		return 1
+		h.notify("Subject line too long. Do you want to abort? (y/n)", "red")
+
+		var decision string
+		if _, err := fmt.Fscanln(h.Reader, &decision); err != nil {
+			h.notify("Could not read user input.", "red")
+			return 1
+		}
+
+		if decision == "y" {
+			return 1
+		}
+
+		return 0
 	}
 
 	message := fmt.Sprintf("Your subject exceeds the soft limit of 50 chars by %d chars.", numOfExceedingChars)
